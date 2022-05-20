@@ -81,7 +81,7 @@ class Flower {
         this.baseX = Math.random() * 50 - 25;
         this.baseY = Math.random() * 50 - 25;
         this.baseZ = Math.random() * 40 - 20;
-        this.duration = Math.random() * 0.5 + 0.5;
+        this.duration = Math.random() * 0.4 + 1.0;
         this.progressSpeed = Math.random() * 0.005 + 0.004;
         this.easeSpeed = Math.random() * 1.0 + 0.5;
         ///this.basePos = new THREE.Vector3(Math.random() * 100, Math.random() * 100, Math.random() * 100);
