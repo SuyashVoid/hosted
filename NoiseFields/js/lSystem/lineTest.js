@@ -1,79 +1,123 @@
-var lineGeo = new THREE.Geometry();
-let turtlePos = new THREE.Vector3(0, -len * 4, 0);
-lineGeo.vertices.push(turtlePos);
+var paramsLSys = {
+    iterations: 6,
+    theta: 25,
+    thetaRandomness: 0,
+    angle: 0,
+    scale: 0.6,
+    scaleRandomness: 0,
+    constantWidth: true,
+    deltarota: 18
+}
 
 
-var angle;
-var axiom = 'F';
-var sentence = axiom;
-var len = 20;
+var rules = {
+    axiom: "XF",
+    allRules: {
+        F: "FF",
+        X: "F+[[XLL]-XLL]-F[-FXLL]+XLL",
+        Y: "-FX"
+    }
+}
 
-var rules = [];
-rules[0] = {
-    a: 'F',
-    b: 'FF+[+F-F-F]-[-F+F+F]'
-};
 
-function generate() {
-    len *= 0.5;
-    var nextSentence = '';
-    for (var i = 0; i < sentence.length; i++) {
-        var current = sentence.charAt(i);
-        var found = false;
-        for (var j = 0; j < rules.length; j++) {
-            if (current == rules[j].a) {
-                found = true;
-                nextSentence += rules[j].b;
-                break;
+
+function GetAxiomTree() {
+    var Waxiom = rules.axiom;
+    var level = paramsLSys.iterations;
+    while (level > 0) {
+        var m = Waxiom.length;
+        var T = '';
+        for (var j = 0; j < m; j++) {
+            var a = Waxiom[j];
+            let found = false;
+            for (const [key, value] of Object.entries(rules.allRules)) {
+                if (a == key) {
+                    found = true;
+                    T += value;
+                }
             }
+            if (!found) T += a;
         }
-        if (!found) {
-            nextSentence += current;
-        }
+        Waxiom = T;
+        level--;
     }
-    sentence = nextSentence;
-    //createP(sentence);
-    turtle();
+    return Waxiom;
 }
 
-function turtle() {
-    //translate(width / 2, height);
+function DrawTheTree(geom, x_init, y_init, z_init) {
+    var geometry = geom;
+    let points = [];
+    var Wrule = GetAxiomTree();
+    var n = Wrule.length;
+    var stackA = [];
+    var stackV = [];
 
-    for (var i = 0; i < sentence.length; i++) {
-        var current = sentence.charAt(i);
+    var theta = paramsLSys.theta * Math.PI / 180;
+    var scale = paramsLSys.scale;
+    var angle = paramsLSys.angle * Math.PI / 180;
 
-        if (current == 'F') {
-            line(0, 0, 0, -len);
-            translate(0, -len);
-        } else if (current == '+') {
-            rotate(angle);
-        } else if (current == '-') {
-            rotate(-angle);
-        } else if (current == '[') {
-            push();
-        } else if (current == ']') {
-            pop();
+    var x0 = x_init;
+    var y0 = y_init;
+    var z0 = z_init;
+    var rota = 0,
+        rota2 = 0,
+        deltarota = params.deltarota * Math.PI / 180;
+    var axis_x = new THREE.Vector3(1, 0, 0);
+    var axis_y = new THREE.Vector3(0, 1, 0);
+    var axis_z = new THREE.Vector3(0, 0, 1);
+    var axis_delta = new THREE.Vector3(),
+        prev_startpoint = new THREE.Vector3();
+
+    var startpoint = new THREE.Vector3(x0, y0, z0),
+        endpoint = new THREE.Vector3();
+    var vector_delta = new THREE.Vector3(scale, scale, 0);
+    points.push(startpoint.clone())
+
+    for (var j = 0; j < n - (n / 5); j++) {
+        var a = Wrule[j];
+        if (a == "+") {
+            angle -= theta;
         }
+        if (a == "-") {
+            angle += theta;
+        }
+        if (a == "F") {
+            var a = vector_delta.clone().applyAxisAngle(axis_z, angle);
+            endpoint.addVectors(startpoint, a);
+
+            geometry.vertices.push(startpoint.clone());
+            geometry.vertices.push(endpoint.clone());
+            points.push(endpoint.clone())
+
+            prev_startpoint.copy(startpoint);
+            startpoint.copy(endpoint);
+            axis_delta = new THREE.Vector3().copy(a).normalize();
+            rota += deltarota; // + (5.0 - Math.random()*10.0);
+        }
+        if (a == "L") {
+            endpoint.copy(startpoint);
+            endpoint.add(new THREE.Vector3(0, scale * 1.5, 0));
+            var vector_delta2 = new THREE.Vector3().subVectors(endpoint, startpoint);
+            vector_delta2.applyAxisAngle(axis_delta, rota2);
+            endpoint.addVectors(startpoint, vector_delta2);
+
+            geometry.vertices.push(startpoint.clone());
+            geometry.vertices.push(endpoint.clone());
+            points.push(endpoint.clone())
+
+            rota2 += 25 * Math.PI / 180;
+        }
+        if (a == "%") {}
+        if (a == "[") {
+            stackV.push(new THREE.Vector3(startpoint.x, startpoint.y, startpoint.z));
+            stackA[stackA.length] = angle;
+        }
+        if (a == "]") {
+            var point = stackV.pop();
+            startpoint.copy(new THREE.Vector3(point.x, point.y, point.z));
+            angle = stackA.pop();
+        }
+        bush_mark = a;
     }
+    return [points, geometry];
 }
-
-function test() {
-    turtlePos.addVectors()
-    var yAxis = new THREE.Vector3(0, 1, 0);
-    var xAxis = new THREE.Vector3(1, 0, 0);
-    turtlePos.
-    turtlePos.normalize();
-}
-
-function render2() {
-    stats.begin();
-    renderer.render(scene, camera);
-
-    stats.end();
-    requestAnimationFrame(render2);
-}
-
-scene.add(new THREE.Line(lineGeo, new THREE.LineBasicMaterial({
-    color: 0x00ccff
-})));
-render2();

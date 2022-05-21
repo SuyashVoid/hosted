@@ -8,11 +8,23 @@ class Particle {
         this.acc = new THREE.Vector3(0, 0, 0);
         this.angle = new THREE.Euler(0, 0, 0);
         this.mesh = null;
+        this.shouldRun = Math.random() < 0.7;
+        this.shouldChangeHue = Math.random() < 0.5;
+        this.randomBoundaryOffset = this.shouldRun ? Math.random() * params.size * 5 : -params.size / 4;
 
     }
 
     init() {
-        var point = new THREE.Points(pointGeometry, material);
+        let mat = material;
+
+        if (this.shouldChangeHue) {
+            const choseMat = Math.floor(Math.random() * 3);
+            if (choseMat == 0) mat = material;
+            else if (choseMat == 1) mat = mat2;
+            else mat = mat3;
+        }
+
+        var point = new THREE.Points(pointGeometry, mat);
         point.geometry.dynamic = true;
         point.geometry.verticesNeedUpdate = true;
         scene.add(point);
@@ -33,7 +45,9 @@ class Particle {
         this.vel.multiplyScalar(params.particleDrag);
 
         //Position Resets
-        if (this.pos.x > params.size || this.pos.y > params.size || this.pos.z > params.size) {
+
+        if (this.pos.x > this.ex + params.size + this.randomBoundaryOffset || this.pos.y > this.ey + params.size + this.randomBoundaryOffset ||
+            this.pos.z > this.ez + params.size + this.randomBoundaryOffset) {
             this.pos = new THREE.Vector3(this.ex, this.ey, this.ez)
         }
         this.mesh.position.set(this.pos.x, this.pos.y, this.pos.z);
