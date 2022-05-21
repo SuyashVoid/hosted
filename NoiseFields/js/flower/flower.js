@@ -1,5 +1,5 @@
 var params = {
-    flowerCount: 12,
+    flowerCount: 15,
     lines: 3,
     stems: 5,
     angleRange: 0.01,
