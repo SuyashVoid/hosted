@@ -180,7 +180,7 @@ class Flower {
                 this.meshGroup.remove(this.meshGroup.children[0]);
             }
         }
-        this.progress = Math.floor(Math.random() * 150); // overall progress ticker
+        this.progress = 0; // overall progress ticker
         this.progressed = false; // has run once
         this.progressModulo = 0; // resets progress on modulus
         this.progressEffective = 0; // progress amount to use

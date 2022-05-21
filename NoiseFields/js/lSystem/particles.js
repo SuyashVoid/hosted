@@ -1,10 +1,14 @@
 class Particle {
     constructor(x, y, z) {
+        this.ex = x;
+        this.ey = y;
+        this.ez = z;
         this.pos = new THREE.Vector3(x, y, z);
         this.vel = new THREE.Vector3(0, 0, 0);
         this.acc = new THREE.Vector3(0, 0, 0);
         this.angle = new THREE.Euler(0, 0, 0);
         this.mesh = null;
+
     }
 
     init() {
@@ -25,17 +29,13 @@ class Particle {
         this.vel.add(this.acc);
         this.pos.add(this.vel);
 
-        // this.acc.multiplyScalar(params.particleDrag);
-        // this.vel.multiplyScalar(params.particleDrag);
+        this.acc.multiplyScalar(params.particleDrag);
+        this.vel.multiplyScalar(params.particleDrag);
 
         //Position Resets
-        if (this.pos.x > params.size) this.pos.x = 0 + Math.random();
-        if (this.pos.y > params.size) this.pos.y = 0 + Math.random();
-        if (this.pos.z > params.size) this.pos.z = 0 + Math.random();
-        if (this.pos.x < 0) this.pos.x = params.size - Math.random();
-        if (this.pos.y < 0) this.pos.y = params.size - Math.random();
-        if (this.pos.z < 0) this.pos.z = params.size - Math.random();
-
+        if (this.pos.x > params.size || this.pos.y > params.size || this.pos.z > params.size) {
+            this.pos = new THREE.Vector3(this.ex, this.ey, this.ez)
+        }
         this.mesh.position.set(this.pos.x, this.pos.y, this.pos.z);
     }
 }
