@@ -12,7 +12,7 @@ var params = {
     noiseSpeed: 0.005,
     noiseStrength: 0.04,
     noiseFreeze: false,
-    particleCount: 8000,
+    particleCount: 7000,
     particleSize: 0.41,
     particleSpeed: 0.06,
     particleDrag: 0.9,
@@ -38,7 +38,7 @@ f1.add(params, 'noiseScale', 0, 0.5);
 f1.add(params, 'noiseSpeed', 0, 0.05);
 f1.add(params, 'noiseStrength', 0, 0.5);
 f1.add(params, 'noiseFreeze');
-//f2.add(params, 'particleCount', 0, 20000).onFinishChange(particlesInit);
+f2.add(params, 'particleCount', 0, 15000).onFinishChange(particlesInit);
 f2.add(params, 'particleSize', 0, 1);
 f2.add(params, 'particleSpeed', 0, 0.2);
 // f2.add(params, 'particleDrag', 0.8, 1.00);
@@ -131,7 +131,7 @@ var material = new THREE.PointsMaterial({
     map: createCircleTexture('#ffffff', 256),
     transparent: true,
     depthWrite: false,
-    opacity: 0.65,
+    opacity: 0.60,
     blending: THREE.AdditiveBlending
 });
 
@@ -151,7 +151,7 @@ var mat2 = new THREE.PointsMaterial({
     transparent: true,
     color: new THREE.Color(`hsl(${360 + hue + hueRange}, 100%, ${lightness}%)`),
     depthWrite: false,
-    opacity: 0.45,
+    opacity: 0.55,
     blending: THREE.AdditiveBlending
 });
 
@@ -164,7 +164,7 @@ var mat3 = new THREE.PointsMaterial({
     transparent: true,
     color: new THREE.Color(`hsl(${360 + hue + hueRange}, 100%, ${lightness}%)`),
     depthWrite: false,
-    opacity: 0.45,
+    opacity: 0.55,
     blending: THREE.AdditiveBlending
 });
 
