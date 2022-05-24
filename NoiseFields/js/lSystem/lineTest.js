@@ -14,7 +14,7 @@ var rules = {
     axiom: "XF",
     allRules: {
         F: "FF",
-        X: "F+[[XLL]-XLL]-F[-FXLL]+XLL",
+        X: "F+[[X]-X]-F[-FX]+X",
         Y: "-FX"
     }
 }
