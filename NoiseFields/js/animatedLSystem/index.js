@@ -47,7 +47,7 @@ var params = {
     particleBlending: THREE.AdditiveBlending,
     particleSkip: 1,
     animStepSize: 1,
-    animationDuration: 60,
+    animationDuration: 600,
     Preset: 0,
     RestartAnimation() {
         restartAnimation();
