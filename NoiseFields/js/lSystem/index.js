@@ -54,12 +54,13 @@ function setupGUI() {
     for (var key in rules.allRules) {
         f4.add(rules.allRules, key);
     }
-    gui.add(paramsLSys, 'iterations', 0, 7, 1);
-    gui.add(params, 'renderIterations');
+    // gui.add(paramsLSys, 'iterations', 0, 7, 1);
+    // gui.add(params, 'renderIterations');
 
-    gui.add(params, 'x', -90, 90).onFinishChange(resetSystem)
-    gui.add(params, 'y', -90, 90).onFinishChange(resetSystem)
-    gui.add(params, 'z', -90, 90).onFinishChange(resetSystem)
+    // gui.add(params, 'x', -90, 90).onFinishChange(resetSystem)
+    // gui.add(params, 'y', -90, 90).onFinishChange(resetSystem)
+    // gui.add(params, 'z', -90, 90).onFinishChange(resetSystem)
+    gui.add(params, 'trailLen', 0.5, 1, 0.05);
 
     f1.close()
     f2.close()
@@ -89,7 +90,7 @@ function setupRenderer() {
     composer.addPass(new RenderPass(scene, camera));
 
     afterimagePass = new AfterimagePass();
-    afterimagePass.uniforms['damp'].value = 0.88;
+    afterimagePass.uniforms['damp'].value = params.trailLen;
     composer.addPass(afterimagePass);
 
     stats.showPanel(0);
@@ -179,6 +180,7 @@ function render() {
     }
     // Update params
     //renderer.setClearColor(0x000000, 0);
+    afterimagePass.uniforms['damp'].value = params.trailLen;
     material.color.setHex(params.particleColor);
     plantMaterial.color.setHex(params.plantColor)
     material.size = params.particleSize;

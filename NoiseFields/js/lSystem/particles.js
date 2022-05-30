@@ -31,6 +31,7 @@ var params = {
     bgColor: 0xa9bcab,
     particleBlending: THREE.AdditiveBlending,
     particleSkip: 2,
+    trailLen: 0.8,
     animationDuration: 600,
     Preset: 0,
     renderIterations() {
