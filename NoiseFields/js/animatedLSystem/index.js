@@ -220,18 +220,19 @@ function particlesInit(frame) {
     let results = DrawTheTree(plantGeo, 0, 0, 0, 24, endIndex);
     dataPoints = results[0];
     plantGeo = results[1];
-    // scene.remove.apply(scene, scene.children);
+    plantGeo.center()
+        // scene.remove.apply(scene, scene.children);
     if (dataPoints.length > 5000 && dataPoints.length < 9000) params.particleSkip = 2;
     else if (dataPoints.length >= 9000 && dataPoints.length < 130000) params.particleSkip = 3;
     else if (dataPoints.length >= 13000) params.particleSkip = 6;
 
-    for (var i = particles.length; i < dataPoints.length; i += params.particleSkip) {
+    for (var i = particles.length * 2; i < plantGeo.vertices.length; i += 2 * params.particleSkip) {
         const zOffset = Math.floor((Math.random() * zVariance) - (zVariance / 4));
 
         var p = new Particle(
-            Math.floor(dataPoints[i].x),
-            Math.floor(dataPoints[i].y),
-            Math.floor(dataPoints[i].z + zOffset)
+            Math.floor(plantGeo.vertices[i].x),
+            Math.floor(plantGeo.vertices[i].y),
+            Math.floor(plantGeo.vertices[i].z + zOffset)
         );
         p.init();
         particles.push(p);
@@ -240,8 +241,8 @@ function particlesInit(frame) {
     plant = new THREE.LineSegments(plantGeo, plantMaterial);
     scene.add(plant)
     if (frameCount < 100) {}
-    if (frameCount < params.animationDuration - (params.animationDuration / 9))
-        fitCameraToObject(camera, plant, 2.22, controls)
+    //if (frameCount < params.animationDuration - (params.animationDuration / 9))
+    fitCameraToObject(camera, plant, 2.22, null)
 
 }
 
@@ -254,11 +255,11 @@ function makeOneMoreTree() {
     let plant2 = new THREE.LineSegments(plantGeo, plantMaterial);
     scene.add(plant2)
     drawnExtra = true;
-    fitCameraToObject(camera, plant, 2.22, controls)
+    fitCameraToObject(camera, plant, 2.22, null)
 }
 
 function render() {
-    controls.update();
+    //controls.update();
     stats.begin();
     // Update particles based on their coords
     for (var i = 0; i < particles.length; i++) {
@@ -279,9 +280,9 @@ function render() {
 
     if (frameCount > params.animationDuration - (params.animationDuration / 10) && !drawnExtra) {
         //Removing this console.log can ff things up! Beware
-        console.log("Delay")
-        controls.setCustomState(new THREE.Vector3(47, 76, 3), new THREE.Vector3(45, 0, 35), 1)
-        drawnExtra = true;
+        //console.log("Delay")
+        //controls.setCustomState(new THREE.Vector3(47, 76, 3), new THREE.Vector3(45, 0, 35), 1)
+        //drawnExtra = true;
     }
 
     // Update params
@@ -349,8 +350,15 @@ const fitCameraToObject = function(camera, object, offset, controls) {
 
 function setupOrbit() {
     controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.enableRotate = true;
+    // controls.enableDamping = true;
+    // controls.enableRotate = true;
+    // camera.position.x = 
+    // camera.position.y = 
+    // camera.position.z = 
+    // camera.rotateX()
+    // camera.rotateY()
+    // camera.rotateZ()
+
 }
 
 setupGUI()

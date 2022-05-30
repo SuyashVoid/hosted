@@ -18,9 +18,9 @@ var params = {
     y: 90,
     z: 0,
     size: 20,
-    noiseScale: 0.08,
-    noiseSpeed: 0.005,
-    noiseStrength: 0.04,
+    noiseScale: 0.04,
+    noiseSpeed: 0.003,
+    noiseStrength: 0.3,
     noiseFreeze: false,
     particleCount: 0,
     particleSize: 0.41,
@@ -52,7 +52,7 @@ function setupMaterials() {
     plantMaterial = new THREE.LineBasicMaterial({
         color: params.particleColor,
         transparent: true,
-        opacity: 0.12,
+        opacity: 0.08,
         blending: THREE.AdditiveBlending
     });
 
