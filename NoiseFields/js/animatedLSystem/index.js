@@ -9,7 +9,9 @@ let currentPreset = 0;
 // Positon of possible particles
 var dataPoints = [];
 // Scene global variables
-let plant;
+var controls;
+let drawnExtra = false;
+let plant = null;
 var scene;
 var camera;
 var renderer;
@@ -25,6 +27,7 @@ var particles = [];
 var pointGeometry = new THREE.Geometry();
 const simplex = new SimplexNoise();
 // Render Constants
+//var params.animStepSize = 3; // Advance l-system growth every 10 frames
 var frameCount = 0;
 var noise = 0;
 var noiseOffset = Math.random() * 3;
@@ -43,8 +46,12 @@ var params = {
     bgColor: 0x000000,
     particleBlending: THREE.AdditiveBlending,
     particleSkip: 1,
-    animationDuration: 600,
+    animStepSize: 1,
+    animationDuration: 60,
     Preset: 0,
+    RestartAnimation() {
+        restartAnimation();
+    },
     renderIterations() {
         particlesInit();
     }
@@ -57,6 +64,7 @@ function setupGUI() {
     var f2 = gui.addFolder('Particles');
     var f3 = gui.addFolder('Graphics');
     var f4 = gui.addFolder('Draw').onFinishChange(resetSystem);
+    var f5 = gui.addFolder('Animation').onFinishChange(restartAnimation)
 
     f1.add(params, 'size', 1, 100).onFinishChange(resetSystem);
     f1.add(params, 'noiseScale', 0, 0.5);
@@ -66,10 +74,10 @@ function setupGUI() {
     f2.add(params, 'particleCount', 0, 15000).onFinishChange(resetSystem);
     f2.add(params, 'particleSize', 0, 1);
     f2.add(params, 'particleSpeed', 0, 0.2);
-    f2.add(params, 'particleDrag', 0.8, 1.00);
+    //f2.add(params, 'particleDrag', 0.8, 1.00);
     f2.addColor(params, 'particleColor');
 
-    f3.addColor(params, 'bgColor');
+    //f3.addColor(params, 'bgColor');
     f3.add(params, 'particleBlending', {
         Additive: THREE.AdditiveBlending,
         Subtractive: THREE.SubtractiveBlending,
@@ -81,8 +89,12 @@ function setupGUI() {
     for (var key in rules.allRules) {
         f4.add(rules.allRules, key);
     }
-    gui.add(paramsLSys, 'iterations', 0, 7, 1);
-    gui.add(params, 'renderIterations');
+    f4.add(paramsLSys, 'iterations', 0, 7, 1);
+    f4.add(params, 'renderIterations');
+
+    f5.add(params, 'animationDuration', 60, 1200, 20)
+    f5.add(params, 'animStepSize', 1, 20, 1)
+    f5.add(params, 'RestartAnimation')
 
     f1.close()
     f2.close()
@@ -124,7 +136,6 @@ function setupRenderer() {
     document.body.appendChild(stats.dom);
 }
 
-
 function resize() {
     let resolution = new THREE.Vector2(window.innerWidth, window.innerHeight);
     let dpr = window.devicePixelRatio > 1 ? 2 : 1;
@@ -136,7 +147,6 @@ function resize() {
     renderer.setSize(resolution.x, resolution.y);
 }
 
-
 function setupMaterials() {
     material = new THREE.PointsMaterial({
         size: 1,
@@ -144,7 +154,7 @@ function setupMaterials() {
         map: createCircleTexture('#ffffff', 256),
         transparent: true,
         depthWrite: false,
-        opacity: 0.60,
+        opacity: 0.70,
         blending: THREE.AdditiveBlending
     });
 
@@ -164,7 +174,7 @@ function setupMaterials() {
         transparent: true,
         color: new THREE.Color(`hsl(${360 + hue + hueRange}, 100%, ${lightness}%)`),
         depthWrite: false,
-        opacity: 0.55,
+        opacity: 0.65,
         blending: THREE.AdditiveBlending
     });
 
@@ -177,34 +187,43 @@ function setupMaterials() {
         transparent: true,
         color: new THREE.Color(`hsl(${360 + hue2 + hueRange}, 100%, ${lightness}%)`),
         depthWrite: false,
-        opacity: 0.55,
+        opacity: 0.65,
         blending: THREE.AdditiveBlending
     });
 }
 
 function resetSystem() {
+    Wrule = GetAxiomTree();
     particles = [];
     pointGeometry = new THREE.Geometry()
+    scene.remove.apply(scene, scene.children);
     pointGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
+    frameCount = params.animStepSize;
+    particlesInit(frameCount)
+}
+
+function restartAnimation() {
+    scene.remove.apply(scene, scene.children)
+    particles = []
     frameCount = 0;
-    particlesInit()
 }
 
 function particlesInit(frame) {
     let zVariance = 20;
 
-
+    let startIndex = Math.floor((frame / params.animationDuration) * Wrule.length);
+    let endIndex = Math.floor(startIndex + (Wrule.length / (params.animationDuration / params.animStepSize))) - 1
     let plantGeo = new THREE.Geometry();
-    let results = DrawTheTree(plantGeo, 20, 10, 2, 0, Wrule.length);
+
+    let results = DrawTheTree(plantGeo, 0, 0, 0, 24, endIndex);
     dataPoints = results[0];
     plantGeo = results[1];
+    // scene.remove.apply(scene, scene.children);
     if (dataPoints.length > 5000 && dataPoints.length < 9000) params.particleSkip = 2;
     else if (dataPoints.length >= 9000 && dataPoints.length < 130000) params.particleSkip = 3;
     else if (dataPoints.length >= 13000) params.particleSkip = 6;
-    let particlesCreated = 0;
-    scene.remove.apply(scene, scene.children);
-    for (var i = 0; i < dataPoints.length; i += params.particleSkip) {
-        //const zOffset = Math.floor((Math.random() * zVariance) - (zVariance / 2));
+
+    for (var i = particles.length; i < dataPoints.length; i += params.particleSkip) {
         const zOffset = Math.floor((Math.random() * zVariance) - (zVariance / 4));
 
         var p = new Particle(
@@ -214,29 +233,29 @@ function particlesInit(frame) {
         );
         p.init();
         particles.push(p);
-        particlesCreated++
     }
-    const diff = params.particleCount - particlesCreated;
-    for (var i = 0; diff > 0 && i < diff; i++) {
-        const randIndex = Math.floor(Math.random() * dataPoints.length)
-            //const zOffset = Math.floor((Math.random() * zVariance) )
-        const zOffset = Math.floor((Math.random() * zVariance) - (zVariance / 4))
-        var p = new Particle(
-            Math.floor(dataPoints[randIndex].x),
-            Math.floor(dataPoints[randIndex].y),
-            Math.floor(dataPoints[randIndex].z + zOffset)
-        );
-        p.init();
-        particles.push(p);
-    }
-
+    scene.remove(plant)
     plant = new THREE.LineSegments(plantGeo, plantMaterial);
     scene.add(plant)
+    if (frameCount < 100) {}
+    fitCameraToObject(camera, plant, 2.22, controls)
+
+}
+
+function makeOneMoreTree() {
+    // Get a random particle as root
+    let plantGeo = new THREE.Geometry();
+    let root = dataPoints[Math.floor(Math.random() * dataPoints.length)]
+    console.log("ROOT: " + root.x + ", " + root.y)
+    plantGeo = DrawTheTree(plantGeo, root.x - 15, root.y - 15, 0, 24, Wrule.length)[1];
+    let plant2 = new THREE.LineSegments(plantGeo, plantMaterial);
+    scene.add(plant2)
+    drawnExtra = true;
     fitCameraToObject(camera, plant, 2.22, controls)
 }
 
-
 function render() {
+    controls.update();
     stats.begin();
     // Update particles based on their coords
     for (var i = 0; i < particles.length; i++) {
@@ -247,14 +266,20 @@ function render() {
             p.pos.z * params.noiseScale + noiseOffset + frameCount * params.noiseSpeed
         ) * Math.PI * 2;
 
-        p.angle.set(noise, noise, noise);
+        p.angle.set(noise / 2, noise / 2, noise / 2);
         p.update();
     }
+
+    if (frameCount > 10 && frameCount <= params.animationDuration && frameCount % params.animStepSize == 0) {
+        particlesInit(frameCount)
+    }
+
+    if (frameCount > params.animationDuration && !drawnExtra) {}
 
     // Update params
     renderer.setClearColor(0x000000, 0);
     material.color.setHex(params.particleColor);
-    plantMaterial.color.setHex(params.particleColor)
+    plantMaterial.color.setHex(params.particleColor);
     material.size = params.particleSize;
     mat2.size = params.particleSize;
     mat3.size = params.particleSize;
@@ -304,11 +329,28 @@ const fitCameraToObject = function(camera, object, offset, controls) {
         // prevent camera from zooming out far enough to create far plane cutoff
         controls.maxDistance = cameraToFarEdge * 2;
         controls.saveState();
+        controls.rotate(0, -1 * (1 * (60 / params.animationDuration)) * Math.PI / 180);
+        //
         camera.lookAt(center)
+
 
     } else {
         camera.lookAt(center)
     }
+}
+
+function cameraZoom(zoomDistance) {
+    var currDistance = camera.position.length(),
+        factor = zoomDistance / currDistance;
+
+    camera.position.x *= factor;
+    camera.position.y *= factor;
+    camera.position.z *= factor;
+}
+
+function setupOrbit() {
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
 }
 
 setupGUI()
@@ -316,8 +358,7 @@ setupRenderer();
 setupMaterials()
 resize();
 window.addEventListener('resize', resize, false);
-Wrule = GetAxiomTree();
+setupOrbit();
 resetSystem()
 render();
-var controls = new THREE.OrbitControls(camera, renderer.domElement);
 fitCameraToObject(camera, plant, 2.22, controls)
