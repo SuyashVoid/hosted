@@ -5,7 +5,8 @@ body {
 
 body {
     background: rgb(50, 0, 91);
-    background: linear-gradient(17deg, #7f00ff, #e100ff);
+    /* background: linear-gradient(197deg, #7f00ff, #e100ff); */
+    background: linear-gradient(187deg, #43c6ac, #191654);
     overflow: hidden;
 }
 

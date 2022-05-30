@@ -65,6 +65,9 @@
                 this.panSpeed = 1.0;
                 this.screenSpacePanning = true; // if false, pan orthogonal to world-space direction camera.up
 
+                this.maxPan = new THREE.Vector3(Infinity, Infinity, Infinity)
+                this.minPan = new THREE.Vector3(-Infinity, -Infinity, -Infinity)
+
                 this.keyPanSpeed = 7.0; // pixels moved per arrow key push
                 // Set to true to automatically rotate around the target
                 // If auto-rotate is enabled, you must call controls.update() in your animation loop
@@ -252,6 +255,8 @@
                             scope.target.add(panOffset);
 
                         }
+
+                        scope.target.clamp(this.minPan, this.maxPan);
 
                         offset.setFromSpherical(spherical); // rotate offset back to "camera-up-vector-is-up" space
 

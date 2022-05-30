@@ -1,8 +1,8 @@
 // Coolor constants (can be integrated)
-let baseHue = 290;
+let baseHue = 90;
 let hueVariance = 50;
 let hueRange = 30;
-let lightness = 60;
+let lightness = 70;
 // Control variables
 var gui;
 let currentPreset = 0;
@@ -10,7 +10,6 @@ let currentPreset = 0;
 var dataPoints = [];
 // Scene global variables
 var controls;
-let plant;
 var scene;
 var camera;
 var renderer;
@@ -31,20 +30,23 @@ var noise = 0;
 var noiseOffset = Math.random() * 3;
 
 var params = {
+    x: 0,
+    y: 90,
+    z: 0,
     size: 20,
     noiseScale: 0.08,
     noiseSpeed: 0.005,
     noiseStrength: 0.04,
     noiseFreeze: false,
-    particleCount: 7000,
+    particleCount: 0,
     particleSize: 0.41,
     particleSpeed: 0.06,
     particleDrag: 0.9,
-    particleColor: 0xffffff, //0x41a5ff, 0xff6728
-    plantColor: 0x22c335,
+    particleColor: 0xc831d3, //0x41a5ff, 0xff6728
+    plantColor: 0x158e50,
     bgColor: 0xa9bcab,
     particleBlending: THREE.AdditiveBlending,
-    particleSkip: 1,
+    particleSkip: 2,
     animationDuration: 600,
     Preset: 0,
     renderIterations() {
@@ -87,10 +89,15 @@ function setupGUI() {
     gui.add(paramsLSys, 'iterations', 0, 7, 1);
     gui.add(params, 'renderIterations');
 
+    gui.add(params, 'x', -90, 90).onFinishChange(resetSystem)
+    gui.add(params, 'y', -90, 90).onFinishChange(resetSystem)
+    gui.add(params, 'z', -90, 90).onFinishChange(resetSystem)
+
     f1.close()
     f2.close()
     f3.close()
     f4.close()
+    gui.close()
 }
 
 function createCircleTexture(color, size) {
@@ -190,53 +197,48 @@ function resetSystem() {
     Wrule = GetAxiomTree();
     pointGeometry = new THREE.Geometry()
     pointGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
+    scene.remove.apply(scene, scene.children);
     frameCount = 0;
-    particlesInit()
+    particlesInit(10, 0, 0, 25, 0, 0, 20)
+    particlesInit(100, 0, 0, -25, 0, 0, 50)
+    particlesInit(118, 8, 0, 25, -40, -90, 30)
+    particlesInit(-18, 2, 0, 25, 40, -90, -30)
+
+    //controls.setCustomState(new THREE.Vector3(45, 8, 12), new THREE.Vector3(44, -88, 30), 1)
+
 }
 
-function particlesInit(frame) {
-    let zVariance = 20;
+function geoRotate(geoX, geoY, geoZ) {
+    plantGeo.rotateX(geoX * Math.PI / 180)
+    plantGeo.rotateY(geoY * Math.PI / 180)
+    plantGeo.rotateZ(geoZ * Math.PI / 180)
+}
 
-
+function particlesInit(x, y, z, angle, geoX, geoY, geoZ) {
     let plantGeo = new THREE.Geometry();
-    let results = DrawTheTree(plantGeo, 20, 10, 2, 24, Wrule.length);
-    dataPoints = results[0];
-    plantGeo = results[1];
-    if (dataPoints.length > 5000 && dataPoints.length < 9000) params.particleSkip = 2;
-    else if (dataPoints.length >= 9000 && dataPoints.length < 130000) params.particleSkip = 3;
-    else if (dataPoints.length >= 13000) params.particleSkip = 6;
-    let particlesCreated = 0;
-    scene.remove.apply(scene, scene.children);
-    for (var i = 0; i < dataPoints.length; i += params.particleSkip) {
-        //const zOffset = Math.floor((Math.random() * zVariance) - (zVariance / 2));
-        const zOffset = Math.floor((Math.random() * zVariance) - (zVariance / 4));
+    plantGeo = DrawTheTree(plantGeo, 0, 0, 0, 24, Wrule.length, angle);
 
-        var p = new Particle(
-            Math.floor(dataPoints[i].x),
-            Math.floor(dataPoints[i].y),
-            Math.floor(dataPoints[i].z + zOffset)
-        );
-        p.init();
-        particles.push(p);
-        particlesCreated++
-    }
-    const diff = params.particleCount - particlesCreated;
-    for (var i = 0; diff > 0 && i < diff; i++) {
-        const randIndex = Math.floor(Math.random() * dataPoints.length)
-            //const zOffset = Math.floor((Math.random() * zVariance) )
-        const zOffset = Math.floor((Math.random() * zVariance) - (zVariance / 4))
-        var p = new Particle(
-            Math.floor(dataPoints[randIndex].x),
-            Math.floor(dataPoints[randIndex].y),
-            Math.floor(dataPoints[randIndex].z + zOffset)
-        );
-        p.init();
-        particles.push(p);
-    }
-
-    plant = new THREE.LineSegments(plantGeo, plantMaterial);
+    plantGeo.center()
+    plantGeo.rotateX(geoX * Math.PI / 180)
+    plantGeo.rotateY(geoY * Math.PI / 180)
+    plantGeo.rotateZ(geoZ * Math.PI / 180)
+    plantGeo.translate(x, y, z)
+    let plant = new THREE.LineSegments(plantGeo, plantMaterial);
     scene.add(plant)
-    fitCameraToObject(camera, plant, 2.22, controls)
+        // if (scene.children.length < 2) fitCameraToObject(camera, plant, 2.25, controls)
+    for (var i = 0; i < plant.geometry.vertices.length; i += 2 * params.particleSkip) {
+
+        const worldPt = plant.geometry.vertices[i]
+        var p = new Particle(
+            Math.floor(worldPt.x),
+            Math.floor(worldPt.y),
+            Math.floor(worldPt.z)
+        );
+        p.init();
+        particles.push(p);
+    }
+
+
 }
 
 
@@ -255,7 +257,6 @@ function render() {
         p.angle.set(noise, noise, noise);
         p.update();
     }
-
     // Update params
     renderer.setClearColor(0x000000, 0);
     material.color.setHex(params.particleColor);
@@ -265,7 +266,10 @@ function render() {
     mat3.size = params.particleSize;
     material.blending = parseInt(params.particleBlending);
     if (!params.noiseFreeze) frameCount++;
-
+    let incrementer = -0.0001
+    controls.rotate(0.00002, 0.00001)
+    controls.target = new THREE.Vector3(controls.target.x + incrementer, controls.target.y + 0.04, controls.target.z)
+        //controls.maxDistance += incrementer
     renderer.render(scene, camera);
     stats.end();
     requestAnimationFrame(render);
@@ -319,9 +323,12 @@ const fitCameraToObject = function(camera, object, offset, controls) {
 function setupOrbit() {
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    //controls.enableRotate = false
-    //controls.rotate(-50 * Math.PI / 180, -50 * Math.PI / 180)
-    //camera.position.set(new THREE.Vector3(90, 20, 55))    
+    controls.minPan = new THREE.Vector3(30, -35, 7);
+    controls.maxPan = new THREE.Vector3(80, 65, 30)
+    controls.minDistance = 1
+    controls.maxDistance = 107
+        //controls.enableRotate = false
+        //controls.autoRotate = true;
 }
 
 
@@ -333,8 +340,3 @@ resize();
 window.addEventListener('resize', resize, false);
 resetSystem()
 render();
-fitCameraToObject(camera, plant, 2.22, controls)
-controls.setCustomState(new THREE.Vector3(92, 85, 9), new THREE.Vector3(90, 11, 28.2), 1)
-    // camera.position.x = 40;
-    //camera.position.y = -10;
-    // camera.position.z = 50;

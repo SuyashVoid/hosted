@@ -45,14 +45,14 @@ function GetAxiomTree() {
     return Waxiom;
 }
 
-function DrawTheTree(geom, x_init, y_init, z_init, startIndex, endIndex) {
+function DrawTheTree(geom, x_init, y_init, z_init, startIndex, endIndex, theta) {
     let geometry = geom;
-    let points = [];
+    //geometry.rotateX(Math.PI / 2)    
     let n = Wrule.length;
     let stackA = [];
     let stackV = [];
 
-    let theta = paramsLSys.theta * Math.PI / 180;
+    theta = theta * Math.PI / 180;
     let scale = paramsLSys.scale;
     let angle = paramsLSys.angle * Math.PI / 180;
 
@@ -71,7 +71,6 @@ function DrawTheTree(geom, x_init, y_init, z_init, startIndex, endIndex) {
     let startpoint = new THREE.Vector3(x0, y0, z0),
         endpoint = new THREE.Vector3();
     let vector_delta = new THREE.Vector3(scale, scale, 0);
-    points.push(startpoint.clone())
     let whereToEnd = Math.min(endIndex, n - (n / 5))
     for (let j = 0; j < whereToEnd; j++) {
         let a = Wrule[j];
@@ -88,7 +87,6 @@ function DrawTheTree(geom, x_init, y_init, z_init, startIndex, endIndex) {
             if (j >= startIndex) {
                 geometry.vertices.push(startpoint.clone());
                 geometry.vertices.push(endpoint.clone());
-                points.push(endpoint.clone())
             }
 
             prev_startpoint.copy(startpoint);
@@ -106,7 +104,6 @@ function DrawTheTree(geom, x_init, y_init, z_init, startIndex, endIndex) {
             if (j >= startIndex) {
                 geometry.vertices.push(startpoint.clone());
                 geometry.vertices.push(endpoint.clone());
-                points.push(endpoint.clone())
             }
 
 
@@ -124,5 +121,5 @@ function DrawTheTree(geom, x_init, y_init, z_init, startIndex, endIndex) {
         }
         bush_mark = a;
     }
-    return [points, geometry];
+    return geometry;
 }

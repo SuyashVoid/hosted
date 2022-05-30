@@ -3,15 +3,18 @@ class Particle {
         this.ex = x;
         this.ey = y;
         this.ez = z;
+        this.shouldRun = Math.random() < 0.8;
+        if (!this.shouldRun) {
+            this.ez = 0;
+            z = Math.floor(Math.random() * 8);
+        }
         this.pos = new THREE.Vector3(x, y, z);
         this.vel = new THREE.Vector3(0, 0, 0);
         this.acc = new THREE.Vector3(0, 0, 0);
         this.angle = new THREE.Euler(0, 0, 0);
         this.mesh = null;
-        this.shouldRun = Math.random() < 0.9;
         this.shouldChangeHue = Math.random() < 0.5;
-        this.randomBoundaryOffset = this.shouldRun ? Math.random() * params.size : -params.size / 4;
-
+        this.randomBoundaryOffset = this.shouldRun ? Math.random() * params.size : -params.size / 1.2;
     }
 
     init() {
@@ -33,12 +36,16 @@ class Particle {
     update() {
         this.acc.set(1, 1, 1);
         this.acc.applyEuler(this.angle);
-        this.acc.multiplyScalar(params.noiseStrength);
+        if (!this.shouldRun) {
+            this.acc.multiplyScalar(0.001);
+        } else {
+            this.acc.multiplyScalar(params.noiseStrength);
+        }
 
         this.acc.clampLength(0, params.particleSpeed);
         this.vel.clampLength(0, params.particleSpeed);
-
         this.vel.add(this.acc);
+
         this.pos.add(this.vel);
 
         this.acc.multiplyScalar(params.particleDrag);
