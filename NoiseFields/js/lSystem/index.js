@@ -1,58 +1,26 @@
+import { EffectComposer } from 'https://unpkg.com/three@0.126.0/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'https://unpkg.com/three@0.126.0/examples/jsm/postprocessing/RenderPass.js';
+import { AfterimagePass } from 'https://unpkg.com/three@0.126.0/examples/jsm/postprocessing/AfterimagePass.js';
 // Coolor constants (can be integrated)
-let baseHue = 90;
-let hueVariance = 50;
-let hueRange = 30;
-let lightness = 70;
-// Control variables
 var gui;
-let currentPreset = 0;
-// Positon of possible particles
-var dataPoints = [];
 // Scene global variables
 var controls;
 var scene;
 var camera;
 var renderer;
 // Materials
-var material;
-var plantMaterial;
-var mat2;
-var mat3;
+let composer;
+let afterimagePass;
 // Stats
 var stats = new Stats();
 // Particles, Noise and plant displayed
 var particles = [];
-var pointGeometry = new THREE.Geometry();
+
 const simplex = new SimplexNoise();
 // Render Constants
 var frameCount = 0;
 var noise = 0;
 var noiseOffset = Math.random() * 3;
-
-var params = {
-    x: 0,
-    y: 90,
-    z: 0,
-    size: 20,
-    noiseScale: 0.08,
-    noiseSpeed: 0.005,
-    noiseStrength: 0.04,
-    noiseFreeze: false,
-    particleCount: 0,
-    particleSize: 0.41,
-    particleSpeed: 0.06,
-    particleDrag: 0.9,
-    particleColor: 0xc831d3, //0x41a5ff, 0xff6728
-    plantColor: 0x158e50,
-    bgColor: 0xa9bcab,
-    particleBlending: THREE.AdditiveBlending,
-    particleSkip: 2,
-    animationDuration: 600,
-    Preset: 0,
-    renderIterations() {
-        particlesInit();
-    }
-};
 
 function setupGUI() {
 
@@ -100,24 +68,7 @@ function setupGUI() {
     gui.close()
 }
 
-function createCircleTexture(color, size) {
-    var matCanvas = document.createElement('canvas');
-    matCanvas.width = matCanvas.height = size;
-    var matContext = matCanvas.getContext('2d');
-    // create texture object from canvas.
-    var texture = new THREE.Texture(matCanvas);
-    // Draw a circle
-    var center = size / 2;
-    matContext.beginPath();
-    matContext.arc(center, center, size / 2, 0, 2 * Math.PI, false);
-    matContext.closePath();
-    matContext.fillStyle = color;
-    matContext.fill();
-    // need to set needsUpdate
-    texture.needsUpdate = true;
-    // return a texture made from the canvas
-    return texture;
-}
+
 
 function setupRenderer() {
     scene = new THREE.Scene();
@@ -127,8 +78,19 @@ function setupRenderer() {
     camera.position.set(30, 50, 135);
     camera.rotation.set(-0.08, 0.015, 0.05);
 
+    //renderer = new THREE.WebGLRenderer({ antiAlias: true, alpha: true, preserveDrawingBuffer: true });
     renderer = new THREE.WebGLRenderer({ antiAlias: true, alpha: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    //renderer.autoClearColor = false;
     document.body.appendChild(renderer.domElement);
+
+    composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+
+    afterimagePass = new AfterimagePass();
+    afterimagePass.uniforms['damp'].value = 0.88;
+    composer.addPass(afterimagePass);
 
     stats.showPanel(0);
     document.body.appendChild(stats.dom);
@@ -147,50 +109,7 @@ function resize() {
 }
 
 
-function setupMaterials() {
-    material = new THREE.PointsMaterial({
-        size: 1,
-        color: params.particleColor,
-        map: createCircleTexture('#ffffff', 256),
-        transparent: true,
-        depthWrite: false,
-        opacity: 0.60,
-        blending: THREE.AdditiveBlending
-    });
 
-    plantMaterial = new THREE.LineBasicMaterial({
-        color: params.particleColor,
-        transparent: true,
-        opacity: 0.3,
-        blending: THREE.AdditiveBlending,
-    });
-
-    let plusOrMinus = Math.random() < 0.5 ? -1 : 1;
-    let colorVariance = Math.floor(Math.random() * hueVariance) * plusOrMinus;
-    const hue = (baseHue + colorVariance) % 360;
-    mat2 = new THREE.PointsMaterial({
-        size: 1,
-        map: createCircleTexture('#ffffff', 256),
-        transparent: true,
-        color: new THREE.Color(`hsl(${360 + hue + hueRange}, 100%, ${lightness}%)`),
-        depthWrite: false,
-        opacity: 0.55,
-        blending: THREE.AdditiveBlending
-    });
-
-    plusOrMinus = Math.random() < 0.5 ? -1 : 1;
-    colorVariance = Math.floor(Math.random() * hueVariance) * plusOrMinus;
-    const hue2 = (baseHue + 50) % 360;
-    mat3 = new THREE.PointsMaterial({
-        size: 1,
-        map: createCircleTexture('#ffffff', 256),
-        transparent: true,
-        color: new THREE.Color(`hsl(${360 + hue2 + hueRange}, 100%, ${lightness}%)`),
-        depthWrite: false,
-        opacity: 0.55,
-        blending: THREE.AdditiveBlending
-    });
-}
 
 function resetSystem() {
     particles = [];
@@ -234,7 +153,7 @@ function particlesInit(x, y, z, angle, geoX, geoY, geoZ) {
             Math.floor(worldPt.y),
             Math.floor(worldPt.z)
         );
-        p.init();
+        p.init(scene);
         particles.push(p);
     }
 
@@ -258,7 +177,7 @@ function render() {
         p.update();
     }
     // Update params
-    renderer.setClearColor(0x000000, 0);
+    //renderer.setClearColor(0x000000, 0);
     material.color.setHex(params.particleColor);
     plantMaterial.color.setHex(params.plantColor)
     material.size = params.particleSize;
@@ -268,9 +187,11 @@ function render() {
     if (!params.noiseFreeze) frameCount++;
     let incrementer = -0.0001
     controls.rotate(0.00002, 0.00001)
-    controls.target = new THREE.Vector3(controls.target.x + incrementer, controls.target.y + 0.04, controls.target.z)
-        //controls.maxDistance += incrementer
-    renderer.render(scene, camera);
+    controls.target = new THREE.Vector3(controls.target.x + incrementer, controls.target.y + 0.01, controls.target.z)
+    composer.render();
+    //renderer.render(scene, camera);
+
+    //if (frameCount % 10 == 0) renderer.clear()
     stats.end();
     requestAnimationFrame(render);
 }

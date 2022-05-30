@@ -163,7 +163,7 @@ function setupMaterials() {
     plantMaterial = new THREE.LineBasicMaterial({
         color: params.particleColor,
         transparent: true,
-        opacity: 0.3,
+        opacity: 0.12,
         blending: THREE.AdditiveBlending,
     });
 
@@ -240,7 +240,8 @@ function particlesInit(frame) {
     plant = new THREE.LineSegments(plantGeo, plantMaterial);
     scene.add(plant)
     if (frameCount < 100) {}
-    fitCameraToObject(camera, plant, 2.22, controls)
+    if (frameCount < params.animationDuration - (params.animationDuration / 9))
+        fitCameraToObject(camera, plant, 2.22, controls)
 
 }
 
@@ -276,8 +277,7 @@ function render() {
         particlesInit(frameCount)
     }
 
-    if (frameCount > params.animationDuration && !drawnExtra) {
-        //controls.setCustomState(new THREE.Vector3(47, 76, 3), new THREE.Vector3(45, -16, 31), 1)
+    if (frameCount > params.animationDuration - (params.animationDuration / 10) && !drawnExtra) {
         //Removing this console.log can ff things up! Beware
         console.log("Delay")
         controls.setCustomState(new THREE.Vector3(47, 76, 3), new THREE.Vector3(45, 0, 35), 1)

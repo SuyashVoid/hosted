@@ -61,7 +61,8 @@ function DrawTheTree(geom, x_init, y_init, z_init, startIndex, endIndex, theta) 
     let z0 = z_init;
     let rota = 0,
         rota2 = 0,
-        deltarota = params.deltarota * Math.PI / 180;
+        deltarota = 0;
+    //let deltarota = params.deltarota * Math.PI / 180;
     let axis_x = new THREE.Vector3(1, 0, 0);
     let axis_y = new THREE.Vector3(0, 1, 0);
     let axis_z = new THREE.Vector3(0, 0, 1);
