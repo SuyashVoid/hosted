@@ -204,7 +204,7 @@ function resetSystem() {
     particlesInit(118, 8, 0, 25, -40, -90, 30)
     particlesInit(-18, 2, 0, 25, 40, -90, -30)
 
-    //controls.setCustomState(new THREE.Vector3(45, 8, 12), new THREE.Vector3(44, -88, 30), 1)
+    controls.setCustomState(new THREE.Vector3(45, 8, 12), new THREE.Vector3(44, -88, 30), 1)
 
 }
 
