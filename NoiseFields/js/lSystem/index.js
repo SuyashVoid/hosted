@@ -120,10 +120,11 @@ function resetSystem() {
     frameCount = 0;
     particlesInit(10, 0, 0, 25, 0, 0, 20)
     particlesInit(100, 0, 0, -25, 0, 0, 50)
-    particlesInit(118, 8, 0, 25, -40, -90, 30)
-    particlesInit(-18, 2, 0, 25, 40, -90, -30)
+        // particlesInit(118, 8, 0, 25, -40, -90, 30)
+        // particlesInit(-18, 2, 0, 25, 40, -90, -30)
 
     controls.setCustomState(new THREE.Vector3(45, 8, 12), new THREE.Vector3(44, -88, 30), 1)
+
 
 }
 
@@ -156,7 +157,7 @@ function particlesInit(x, y, z, angle, geoX, geoY, geoZ) {
         p.init(scene);
         particles.push(p);
     }
-
+    //fitCameraToObject(camera, plant, 2, controls)
 
 }
 

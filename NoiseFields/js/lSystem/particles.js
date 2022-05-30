@@ -7,7 +7,7 @@ var pointGeometry = new THREE.Geometry();
 let baseHue = 90;
 let hueVariance = 50;
 let hueRange = 30;
-let lightness = 70;
+let lightness = 90;
 // Control variables
 var gui;
 let currentPreset = 0;
@@ -26,7 +26,7 @@ var params = {
     particleSize: 0.41,
     particleSpeed: 0.06,
     particleDrag: 0.9,
-    particleColor: 0xc831d3, //0x41a5ff, 0xff6728
+    particleColor: 0xee00ff, //0x41a5ff, 0xff6728
     plantColor: 0x158e50,
     bgColor: 0xa9bcab,
     particleBlending: THREE.AdditiveBlending,
