@@ -144,6 +144,27 @@
 
                 }; // this method is exposed, but perhaps it would be better if we can make it private...
 
+                this.setCustomState = function(target, position, zoom) {
+
+                    scope.target0.copy(target);
+                    scope.position0.copy(position);
+                    scope.zoom0 = zoom;
+
+                    this.reset()
+
+                    // scope.target.copy(target);
+                    // scope.object.position.copy(position);
+                    // scope.object.zoom = zoom;
+                    // scope.object.updateProjectionMatrix();
+                    // scope.dispatchEvent(_changeEvent);
+                    // scope.update();
+                    // state = STATE.NONE;
+                }
+
+                this.saveCustomState = function() {
+                    return { "target": scope.target, "position": scope.object.position, "zoom": scope.object.zoom }
+                }
+
                 this.rotate = function(rotateX, rotateY) {
                     // rotateX angle to mouse X
                     let element = scope.domElement;

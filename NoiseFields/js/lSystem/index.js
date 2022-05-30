@@ -9,6 +9,7 @@ let currentPreset = 0;
 // Positon of possible particles
 var dataPoints = [];
 // Scene global variables
+var controls;
 let plant;
 var scene;
 var camera;
@@ -39,8 +40,9 @@ var params = {
     particleSize: 0.41,
     particleSpeed: 0.06,
     particleDrag: 0.9,
-    particleColor: 0x41a5ff, //0x41a5ff, 0xff6728
-    bgColor: 0x000000,
+    particleColor: 0xffffff, //0x41a5ff, 0xff6728
+    plantColor: 0x22c335,
+    bgColor: 0xa9bcab,
     particleBlending: THREE.AdditiveBlending,
     particleSkip: 1,
     animationDuration: 600,
@@ -55,7 +57,7 @@ function setupGUI() {
     gui = new lil.GUI;
     var f1 = gui.addFolder('Flow Field');
     var f2 = gui.addFolder('Particles');
-    var f3 = gui.addFolder('Graphics');
+    var f3 = gui.addFolder('Colors');
     var f4 = gui.addFolder('Draw').onFinishChange(resetSystem);
 
     f1.add(params, 'size', 1, 100).onFinishChange(resetSystem);
@@ -67,9 +69,10 @@ function setupGUI() {
     f2.add(params, 'particleSize', 0, 1);
     f2.add(params, 'particleSpeed', 0, 0.2);
     f2.add(params, 'particleDrag', 0.8, 1.00);
-    f2.addColor(params, 'particleColor');
+    f3.addColor(params, 'particleColor');
+    f3.addColor(params, 'plantColor');
 
-    f3.addColor(params, 'bgColor');
+    //f3.addColor(params, 'bgColor');
     f3.add(params, 'particleBlending', {
         Additive: THREE.AdditiveBlending,
         Subtractive: THREE.SubtractiveBlending,
@@ -184,6 +187,7 @@ function setupMaterials() {
 
 function resetSystem() {
     particles = [];
+    Wrule = GetAxiomTree();
     pointGeometry = new THREE.Geometry()
     pointGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
     frameCount = 0;
@@ -195,7 +199,7 @@ function particlesInit(frame) {
 
 
     let plantGeo = new THREE.Geometry();
-    let results = DrawTheTree(plantGeo, 20, 10, 2, 0, Wrule.length);
+    let results = DrawTheTree(plantGeo, 20, 10, 2, 24, Wrule.length);
     dataPoints = results[0];
     plantGeo = results[1];
     if (dataPoints.length > 5000 && dataPoints.length < 9000) params.particleSkip = 2;
@@ -237,6 +241,7 @@ function particlesInit(frame) {
 
 
 function render() {
+    controls.update()
     stats.begin();
     // Update particles based on their coords
     for (var i = 0; i < particles.length; i++) {
@@ -254,7 +259,7 @@ function render() {
     // Update params
     renderer.setClearColor(0x000000, 0);
     material.color.setHex(params.particleColor);
-    plantMaterial.color.setHex(params.particleColor)
+    plantMaterial.color.setHex(params.plantColor)
     material.size = params.particleSize;
     mat2.size = params.particleSize;
     mat3.size = params.particleSize;
@@ -300,7 +305,6 @@ const fitCameraToObject = function(camera, object, offset, controls) {
     if (controls) {
         // set camera to rotate around center of loaded object
         controls.target = center;
-
         // prevent camera from zooming out far enough to create far plane cutoff
         controls.maxDistance = cameraToFarEdge * 2;
         controls.saveState();
@@ -311,13 +315,26 @@ const fitCameraToObject = function(camera, object, offset, controls) {
     }
 }
 
+
+function setupOrbit() {
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    //controls.enableRotate = false
+    //controls.rotate(-50 * Math.PI / 180, -50 * Math.PI / 180)
+    //camera.position.set(new THREE.Vector3(90, 20, 55))    
+}
+
+
 setupGUI()
 setupRenderer();
 setupMaterials()
+setupOrbit()
 resize();
 window.addEventListener('resize', resize, false);
-Wrule = GetAxiomTree();
 resetSystem()
 render();
-var controls = new THREE.OrbitControls(camera, renderer.domElement);
 fitCameraToObject(camera, plant, 2.22, controls)
+controls.setCustomState(new THREE.Vector3(92, 85, 9), new THREE.Vector3(90, 11, 28.2), 1)
+    // camera.position.x = 40;
+    //camera.position.y = -10;
+    // camera.position.z = 50;

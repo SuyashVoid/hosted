@@ -2,7 +2,7 @@
 let baseHue = 290;
 let hueVariance = 50;
 let hueRange = 30;
-let lightness = 60;
+let lightness = 90;
 // Control variables
 var gui;
 let currentPreset = 0;
@@ -42,7 +42,8 @@ var params = {
     particleSize: 0.41,
     particleSpeed: 0.06,
     particleDrag: 0.9,
-    particleColor: 0x41a5ff, //0x41a5ff, 0xff6728
+    particleColor: 0xa400f0, //0x41a5ff, 0xff6728
+    plantColor: 0xa9bcab,
     bgColor: 0x000000,
     particleBlending: THREE.AdditiveBlending,
     particleSkip: 1,
@@ -62,7 +63,7 @@ function setupGUI() {
     gui = new lil.GUI;
     var f1 = gui.addFolder('Flow Field');
     var f2 = gui.addFolder('Particles');
-    var f3 = gui.addFolder('Graphics');
+    var f3 = gui.addFolder('Colors');
     var f4 = gui.addFolder('Draw').onFinishChange(resetSystem);
     var f5 = gui.addFolder('Animation').onFinishChange(restartAnimation)
 
@@ -75,7 +76,8 @@ function setupGUI() {
     f2.add(params, 'particleSize', 0, 1);
     f2.add(params, 'particleSpeed', 0, 0.2);
     //f2.add(params, 'particleDrag', 0.8, 1.00);
-    f2.addColor(params, 'particleColor');
+    f3.addColor(params, 'particleColor');
+    f3.addColor(params, 'plantColor');
 
     //f3.addColor(params, 'bgColor');
     f3.add(params, 'particleBlending', {
@@ -154,7 +156,7 @@ function setupMaterials() {
         map: createCircleTexture('#ffffff', 256),
         transparent: true,
         depthWrite: false,
-        opacity: 0.70,
+        opacity: 0.60,
         blending: THREE.AdditiveBlending
     });
 
@@ -172,9 +174,9 @@ function setupMaterials() {
         size: 1,
         map: createCircleTexture('#ffffff', 256),
         transparent: true,
-        color: new THREE.Color(`hsl(${360 + hue + hueRange}, 100%, ${lightness}%)`),
+        //color: new THREE.Color(`hsl(${360 + hue + hueRange}, 100%, ${lightness}%)`),
         depthWrite: false,
-        opacity: 0.65,
+        opacity: 0.45,
         blending: THREE.AdditiveBlending
     });
 
@@ -187,7 +189,7 @@ function setupMaterials() {
         transparent: true,
         color: new THREE.Color(`hsl(${360 + hue2 + hueRange}, 100%, ${lightness}%)`),
         depthWrite: false,
-        opacity: 0.65,
+        opacity: 0.45,
         blending: THREE.AdditiveBlending
     });
 }
@@ -274,12 +276,18 @@ function render() {
         particlesInit(frameCount)
     }
 
-    if (frameCount > params.animationDuration && !drawnExtra) {}
+    if (frameCount > params.animationDuration && !drawnExtra) {
+        //controls.setCustomState(new THREE.Vector3(47, 76, 3), new THREE.Vector3(45, -16, 31), 1)
+        //Removing this console.log can ff things up! Beware
+        console.log("Delay")
+        controls.setCustomState(new THREE.Vector3(47, 76, 3), new THREE.Vector3(45, 0, 35), 1)
+        drawnExtra = true;
+    }
 
     // Update params
     renderer.setClearColor(0x000000, 0);
     material.color.setHex(params.particleColor);
-    plantMaterial.color.setHex(params.particleColor);
+    plantMaterial.color.setHex(params.plantColor);
     material.size = params.particleSize;
     mat2.size = params.particleSize;
     mat3.size = params.particleSize;
@@ -339,18 +347,10 @@ const fitCameraToObject = function(camera, object, offset, controls) {
     }
 }
 
-function cameraZoom(zoomDistance) {
-    var currDistance = camera.position.length(),
-        factor = zoomDistance / currDistance;
-
-    camera.position.x *= factor;
-    camera.position.y *= factor;
-    camera.position.z *= factor;
-}
-
 function setupOrbit() {
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
+    controls.enableRotate = true;
 }
 
 setupGUI()
