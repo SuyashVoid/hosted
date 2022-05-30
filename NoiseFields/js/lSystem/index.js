@@ -187,8 +187,8 @@ function render() {
     material.blending = parseInt(params.particleBlending);
     if (!params.noiseFreeze) frameCount++;
     let incrementer = -0.0001
-    controls.rotate(0.00002, 0.00001)
-    controls.target = new THREE.Vector3(controls.target.x + incrementer, controls.target.y + 0.01, controls.target.z)
+        //controls.rotate(0.00002, 0.00001)
+        //controls.target = new THREE.Vector3(controls.target.x + incrementer, controls.target.y + 0.01, controls.target.z)
     composer.render();
     //renderer.render(scene, camera);
 
@@ -249,7 +249,7 @@ function setupOrbit() {
     controls.maxPan = new THREE.Vector3(80, 65, 30)
     controls.minDistance = 1
     controls.maxDistance = 107
-        //controls.enableRotate = false
+    controls.enableRotate = false
         //controls.autoRotate = true;
 }
 
