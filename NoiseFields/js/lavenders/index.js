@@ -228,7 +228,7 @@ function updateParticles() {
 
         }
         //noise = noised * ((Math.PI * 2) - Math.PI);
-        p.angle.set(boolToDirection(p.isRight) * noise, noise, noise);
+        p.angle.set(boolToDirection(p.isRight) * noise, 0, noise);
         p.update();
     }
 }
