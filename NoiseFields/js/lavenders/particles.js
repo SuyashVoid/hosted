@@ -139,9 +139,9 @@ class Particle {
     }
     update() {
         if (this.isRight)
-            this.acc.set(1, 1.3, 0.1);
+            this.acc.set(1, 1.3, 0);
         else
-            this.acc.set(-1, 1.3, 0.1);
+            this.acc.set(-1, 1.3, 0);
         this.acc.applyEuler(this.angle);
         if (!this.shouldRun) {
             this.acc.multiplyScalar(0.0007);
