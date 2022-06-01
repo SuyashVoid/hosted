@@ -13,7 +13,7 @@ var params = {
     x: 0,
     y: 90,
     z: 0,
-    size: 9,
+    size: 8.1,
     noiseScale: 0.014,
     noiseSpeed: 0.003,
     noiseStrength: 0.3,
@@ -31,7 +31,7 @@ var params = {
     bgGradient2: "#5b86e5",
     bgAngle: 165,
     particleSkip: 2,
-    trailLen: 0.945,
+    trailLen: 0.96,
     animationDuration: 600,
     Preset: 0,
     renderIterations() {

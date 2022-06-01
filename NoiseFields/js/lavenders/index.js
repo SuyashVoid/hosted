@@ -130,10 +130,10 @@ function resetSystem() {
     pointGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
     scene.remove.apply(scene, scene.children);
     frameCount = 0;
-    particlesInit(7, 0, 0, true)
-    particlesInit(35, 0, 0, true)
-    particlesInit(-7, 0, 0, false)
-    particlesInit(-35, 0, 0, false)
+    particlesInit(7, 0, 0, 200, 0.13, true)
+    particlesInit(35, 0, 0, 200, 0.38, true)
+    particlesInit(-7, 0, 0, 200, 0.13, false)
+    particlesInit(-35, 0, 0, 200, 0.38, false)
 
     controls.setCustomState(new THREE.Vector3(1.13, 10.21, -3.65), new THREE.Vector3(1.5, 12.2, 24.7), 1)
 
@@ -141,8 +141,8 @@ function resetSystem() {
 }
 
 
-function particlesInit(x, y, z, isRight) {
-    let dataPoints = giveMeField(x, y, z, 200, 0.18, isRight)
+function particlesInit(x, y, z, len, packDist, isRight) {
+    let dataPoints = giveMeField(x, y, z, len, packDist, isRight)
         //let dataPoints = giveMeField(x, y, z, 30, 0.1)
     for (let i = 0; i < dataPoints.length; i++) {
         var p = new Particle(
