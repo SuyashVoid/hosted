@@ -9,43 +9,14 @@ var gui;
 let currentPreset = 0;
 // Positon of possible particles
 var dataPoints = [];
-var params = {
-    x: 0,
-    y: 90,
-    z: 0,
-    size: 7.1,
-    noiseScale: 0.003,
-    noiseSpeed: 0.0004,
-    noiseStrength: 0.03,
-    noiseFreeze: false,
-    particleCount: 0,
-    particleSize: 0.41,
-    particleSpeed: 0.042,
-    particleColor: 0xee00ff,
-    opacity: 0.65,
-    particleColor2: 0x4400ff,
-    opacity2: 0.65,
-    particleColor3: 0xffffff,
-    opacity3: 0.65,
-    bgGradient1: "#36d1dc",
-    bgGradient2: "#5b86e5",
-    bgAngle: 165,
-    particleSkip: 2,
-    trailLen: 0.96,
-    animationDuration: 600,
-    Preset: 0,
-    renderIterations() {
-        particlesInit();
-    }
-};
 // var params = {
 //     x: 0,
 //     y: 90,
 //     z: 0,
-//     size: 8.1,
-//     noiseScale: 0.014,
-//     noiseSpeed: 0.003,
-//     noiseStrength: 0.3,
+//     size: 7.1,
+//     noiseScale: 0.003,
+//     noiseSpeed: 0.0004,
+//     noiseStrength: 0.03,
 //     noiseFreeze: false,
 //     particleCount: 0,
 //     particleSize: 0.41,
@@ -67,6 +38,35 @@ var params = {
 //         particlesInit();
 //     }
 // };
+var params = {
+    x: 0,
+    y: 90,
+    z: 0,
+    size: 8.1,
+    noiseScale: 0.014,
+    noiseSpeed: 0.003,
+    noiseStrength: 0.3,
+    noiseFreeze: false,
+    particleCount: 0,
+    particleSize: 0.41,
+    particleSpeed: 0.042,
+    particleColor: 0xee00ff,
+    opacity: 0.65,
+    particleColor2: 0x4400ff,
+    opacity2: 0.65,
+    particleColor3: 0xffffff,
+    opacity3: 0.65,
+    bgGradient1: "#36d1dc",
+    bgGradient2: "#5b86e5",
+    bgAngle: 165,
+    particleSkip: 2,
+    trailLen: 0.96,
+    animationDuration: 600,
+    Preset: 0,
+    renderIterations() {
+        particlesInit();
+    }
+};
 
 function setupMaterials() {
     material = new THREE.PointsMaterial({

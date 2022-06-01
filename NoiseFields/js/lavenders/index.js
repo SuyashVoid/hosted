@@ -217,14 +217,24 @@ function render() {
 function updateParticles() {
     for (var i = 0; i < particles.length; i++) {
         var p = particles[i];
-        noise = simplex.noise3D(
+        let noised = simplex.noise3D(
             p.pos.x * params.noiseScale,
             p.pos.y * params.noiseScale,
             p.pos.z * params.noiseScale + noiseOffset + frameCount * params.noiseSpeed
-        ) * Math.PI * 2;
+        );
+        noise = scale(noised, 0, 1, (-Math.PI / 6), Math.PI / 6)
+        if (i == 1) {
+            //console.log(noised)
+
+        }
+        //noise = noised * ((Math.PI * 2) - Math.PI);
         p.angle.set(boolToDirection(p.isRight) * noise, noise, noise);
         p.update();
     }
+}
+
+function scale(number, inMin, inMax, outMin, outMax) {
+    return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 }
 
 function updateMaterial() {
