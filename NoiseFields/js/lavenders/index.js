@@ -130,18 +130,18 @@ function resetSystem() {
     pointGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
     scene.remove.apply(scene, scene.children);
     frameCount = 0;
-    particlesInit(10, 0, 0, 200, 0.13, true)
-    particlesInit(10, 0, 0, 200, 0.13, false)
-        // particlesInit(35, 0, 0, 200, 0.38, true)
-    particlesInit(-10, 0, 0, 200, 0.13, false)
-    particlesInit(-10, 0, 0, 200, 0.13, true)
+    particlesInit(14, 0, 0, 180, 0.13, true)
+    particlesInit(10, 0, 0, 180, 0.13, false)
+        // particlesInit(35, 0, 0, 180, 0.38, true)
+    particlesInit(-10, 0, 0, 180, 0.13, true)
+    particlesInit(-14, 0, 0, 180, 0.13, false)
 
-    particlesInit(-40, 0, 0, 200, 0.19, false)
-    particlesInit(-40, 0, 0, 200, 0.19, true)
+    particlesInit(-44, 0, 0, 180, 0.17, false)
+    particlesInit(-40, 0, 0, 180, 0.17, true)
 
-    particlesInit(40, 0, 0, 200, 0.19, false)
-    particlesInit(40, 0, 0, 200, 0.19, true)
-        // particlesInit(-35, 0, 0, 200, 0.38, false)
+    particlesInit(44, 0, 0, 180, 0.17, true)
+    particlesInit(40, 0, 0, 180, 0.17, false)
+        // particlesInit(-35, 0, 0, 180, 0.38, false)
 
     controls.setCustomState(new THREE.Vector3(1.13, 10.21, -3.65), new THREE.Vector3(1.5, 12.2, 24.7), 1)
 
@@ -168,14 +168,14 @@ function particlesInit(x, y, z, len, packDist, isRight) {
 
 
 function giveMeField(x, y, z, len, packDist, isRight) {
-    const fieldWidth = 8;
-    const xDelta = 0.12
+    const fieldWidth = 4;
+    const xDelta = 0
     let toReturn = []
     const particleCount = len / packDist;
     for (let i = 0; i < particleCount; i++) {
         const xRandom = Math.random() * fieldWidth - (fieldWidth / 2)
         let xOffset = 0
-        if (i > particleCount * 0.5) {
+        if (i > particleCount * 0.3) {
             xOffset = i * boolToDirection(isRight) * -1 * xDelta / 40;
         }
         let zOffset = -1 * Math.pow(i, 0.91) * packDist;

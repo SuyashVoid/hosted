@@ -13,10 +13,10 @@ var params = {
     x: 0,
     y: 90,
     z: 0,
-    size: 8.1,
-    noiseScale: 0.014,
-    noiseSpeed: 0.003,
-    noiseStrength: 0.3,
+    size: 7.1,
+    noiseScale: 0.003,
+    noiseSpeed: 0.0004,
+    noiseStrength: 0.03,
     noiseFreeze: false,
     particleCount: 0,
     particleSize: 0.41,
@@ -38,6 +38,35 @@ var params = {
         particlesInit();
     }
 };
+// var params = {
+//     x: 0,
+//     y: 90,
+//     z: 0,
+//     size: 8.1,
+//     noiseScale: 0.014,
+//     noiseSpeed: 0.003,
+//     noiseStrength: 0.3,
+//     noiseFreeze: false,
+//     particleCount: 0,
+//     particleSize: 0.41,
+//     particleSpeed: 0.042,
+//     particleColor: 0xee00ff,
+//     opacity: 0.65,
+//     particleColor2: 0x4400ff,
+//     opacity2: 0.65,
+//     particleColor3: 0xffffff,
+//     opacity3: 0.65,
+//     bgGradient1: "#36d1dc",
+//     bgGradient2: "#5b86e5",
+//     bgAngle: 165,
+//     particleSkip: 2,
+//     trailLen: 0.96,
+//     animationDuration: 600,
+//     Preset: 0,
+//     renderIterations() {
+//         particlesInit();
+//     }
+// };
 
 function setupMaterials() {
     material = new THREE.PointsMaterial({
@@ -160,7 +189,7 @@ class Particle {
 
         //Position Resets
 
-        if (Math.abs(this.pos.x - this.ex) > params.size + this.randomBoundaryOffset || Math.abs(this.pos.y - this.ey) > params.size + this.randomBoundaryOffset ||
+        if (Math.abs(this.pos.x - this.ex) > params.size / 4 + this.randomBoundaryOffset || Math.abs(this.pos.y - this.ey) > params.size + this.randomBoundaryOffset ||
             Math.abs(this.pos.z - this.ez) > params.size + this.randomBoundaryOffset) {
             this.pos = new THREE.Vector3(this.ex, this.ey, this.ez)
             if (!this.accelerated && this.shouldRun) {
