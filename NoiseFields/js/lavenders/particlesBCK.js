@@ -123,19 +123,14 @@ function createCircleTexture(color, size) {
 }
 
 class Particle {
-    constructor(id, x, y, z, isRight) {
-        this.id = id;
-        this.baseLife = Math.floor(Math.random() * params.lifeLimit / 1.8);
-        this.scaleFactor = Math.random() * 0.2 + 1;
-        this.life = this.baseLife;
-        this.ySpeed = Math.random() * 2.0 + 0.7;
-        this.yFin = Math.random() * 2000 + 3000;
+    constructor(x, y, z, isRight) {
+        this.life = Math.random() * (params.lifeLimit / 10);
         const zVariance = 20;
         const zOffset = Math.floor((Math.random() * zVariance) - (zVariance / 4));
         this.ex = x;
         this.ey = y;
         this.ez = z + zOffset;
-        this.shouldRun = Math.random() < 0.002;
+        this.shouldRun = Math.random() < 1.2;
         if (!this.shouldRun) {
             z = z + Math.floor(Math.random() * 8);
             this.ez = z;
@@ -150,6 +145,8 @@ class Particle {
         //this.shouldChangeHue = Math.random() < 0.66;
         this.randomBoundaryOffset = this.shouldRun ? (-params.size * 0.85) + (Math.random() * (params.size * 0.3)) : -params.size / 1.2;
         //this.randomBoundaryOffset = -params.size / 1.2;
+        this.exceeded = false;
+        this.accelerated = false;
         this.isRight = isRight
     }
 
@@ -165,53 +162,39 @@ class Particle {
         point.geometry.verticesNeedUpdate = true;
         scene.add(point);
         this.mesh = point;
-        if (this.id == 1) console.log(this.life)
+        this.life++;
     }
     update() {
-        this.life += (params.lifeLimit / this.scaleFactor) / 200;
-
-        if (this.shouldRun) {
-            if (this.isRight)
-                this.acc.set(0.8, this.ySpeed, 0);
-            else
-                this.acc.set(-0.8, this.ySpeed, 0);
-            this.acc.applyEuler(this.angle);
-            this.acc.multiplyScalar(params.noiseStrength);
-
-            this.acc.clampLength(0, params.particleSpeed);
-            this.vel.clampLength(0, params.particleSpeed);
-            this.vel.add(this.acc);
-            this.pos.add(this.vel);
-            this.pos.add(this.vel);
+        this.life++;
+        if (this.isRight)
+            this.acc.set(1, 1.3, 0);
+        else
+            this.acc.set(-1, 1.3, 0);
+        this.acc.applyEuler(this.angle);
+        if (!this.shouldRun) {
+            this.acc.multiplyScalar(0.0007);
         } else {
-            //let x = (this.life / params.lifeLimit) / 50
-            let x = numScale(this.life, 0, params.lifeLimit, 0, 2.4)
-            let y = curveFunction(x)
-
-            if (this.isRight)
-                this.pos.x = this.ex + x * 3.4 * this.scaleFactor;
-            else
-                this.pos.x = this.ex + x * -3.4 * this.scaleFactor;
-
-            this.pos.y = this.ey + y * this.ySpeed * this.scaleFactor;
-            this.pos.z = this.ez
+            this.acc.multiplyScalar(params.noiseStrength);
         }
 
-
-
-
-
-
-
+        this.acc.clampLength(0, params.particleSpeed);
+        this.vel.clampLength(0, params.particleSpeed);
+        this.vel.add(this.acc);
+        this.pos.add(this.vel);
 
         // this.acc.multiplyScalar(params.particleDrag);
         // this.vel.multiplyScalar(params.particleDrag);
 
         //Position Resets
 
-        if (this.life > params.lifeLimit) {
+        if (Math.abs(this.pos.x - this.ex) > params.size / 4 + this.randomBoundaryOffset || Math.abs(this.pos.y - this.ey) > params.size + this.randomBoundaryOffset ||
+            Math.abs(this.pos.z - this.ez) > params.size + this.randomBoundaryOffset) {
             this.pos = new THREE.Vector3(this.ex, this.ey, this.ez)
-            this.life = this.baseLife;
+            this.life = 0;
+            if (!this.accelerated && this.shouldRun) {
+                this.randomBoundaryOffset = bottomHeavyRandom(params.size, 1.0);
+                this.accelerated = true;
+            }
         }
         this.mesh.position.set(this.pos.x, this.pos.y, this.pos.z);
     }
@@ -236,10 +219,19 @@ function boolToDirection(trueOrFalse) {
 }
 
 function curveFunction(x) {
-    return 3 * Math.sin(x);
+    return 0.2 * x * x;
 }
 
 function compareControlStates(state1, state2) {
+    // console.log("\nS1 Pos: ");
+    // printVector(state1.position);
+    // console.log("\nS1 Tar: ");
+    // printVector(state1.target);
+    // console.log("\nS2 Pos: ");
+    // printVector(state2.position);
+    // console.log("\nS2 Tar: ");
+    // printVector(state2.target);
+
     if (state1.target.equals(state2.target) && state1.position.equals(state2.position) && state1.zoom == state2.zoom) return true
     else return false;
 }
@@ -250,4 +242,9 @@ function printVector(vector) {
 
 function numScale(number, inMin, inMax, outMin, outMax) {
     return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+}
+
+function compareControlStates(state1, state2) {
+    if (state1.target.equals(state2.target) && state1.position.equals(state2.position) && state1.zoom == state2.zoom) return true
+    else return false;
 }

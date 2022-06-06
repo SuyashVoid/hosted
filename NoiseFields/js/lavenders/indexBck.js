@@ -18,6 +18,7 @@ let afterimagePass;
 var stats = new Stats();
 // Particles, Noise and plant displayed
 var particles = [];
+
 const simplex = new SimplexNoise();
 // Render Constants
 var frameCount = 0;
@@ -36,12 +37,11 @@ function setupGUI() {
     f1.add(params, 'noiseScale', 0, 0.1);
     f1.add(params, 'noiseSpeed', 0, 0.025);
     f1.add(params, 'noiseStrength', 0, 4);
-    //f1.add(params, 'noiseFreeze');
+    f1.add(params, 'noiseFreeze');
     //f2.add(params, 'particleCount', 0, 15000).onFinishChange(resetSystem);
     f2.add(params, 'particleSize', 0, 1);
-    f2.add(params, 'lifeLimit', 30, 400);
     f2.add(params, 'particleSpeed', 0, 0.2);
-    f2.add(params, 'trailLen', 0.8, 1).onFinishChange(trailLenReflector);
+    f2.add(params, 'tempTrailLen', 0.8, 1);
     f3A.addColor(params, 'particleColor');
     f3A.add(params, 'opacity', 0, 1);
     f3A.addColor(params, 'particleColor2');
@@ -54,16 +54,15 @@ function setupGUI() {
     f3B.addColor(params, 'bgGradient2');
     f3B.add(params, 'bgAngle', 0, 360, 1)
 
-    f1.close()
-        // f2.close()
-        // f3.close()
-    gui.close()
+    //f1.close()
+    f2.close()
+    f3.close()
+        // gui.close()
 }
 
 function trailLenReflector() {
     params.tempTrailLen = params.trailLen
 }
-
 
 function setupRenderer() {
     scene = new THREE.Scene();
@@ -133,20 +132,22 @@ function resetSystem() {
     pointGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
     scene.remove.apply(scene, scene.children);
     frameCount = 0;
-    particlesInit(12, 0, 0, 180, 0.13, true)
-    particlesInit(10, 0, 0, 180, 0.13, false)
+    particlesInit(9, 0, 0, 180, 0.13, true)
+    particlesInit(6, 0, 0, 180, 0.13, false)
         // particlesInit(35, 0, 0, 180, 0.38, true)
-    particlesInit(-10, 0, 0, 180, 0.13, true)
-    particlesInit(-12, 0, 0, 180, 0.13, false)
+    particlesInit(-6, 0, 0, 180, 0.13, true)
+    particlesInit(-9, 0, 0, 180, 0.13, false)
 
-    // particlesInit(-40, 0, 0, 180, 0.17, false)
-    // particlesInit(-42, 0, 0, 180, 0.17, true)
+    particlesInit(-36, 0, 0, 180, 0.17, false)
+    particlesInit(-33, 0, 0, 180, 0.17, true)
 
-    // particlesInit(42, 0, 0, 180, 0.17, true)
-    // particlesInit(40, 0, 0, 180, 0.17, false)
-    // particlesInit(-35, 0, 0, 180, 0.38, false)
+    particlesInit(36, 0, 0, 180, 0.17, true)
+    particlesInit(33, 0, 0, 180, 0.17, false)
+        // particlesInit(-35, 0, 0, 180, 0.38, false)
 
-    controls.setCustomState(new THREE.Vector3(1.13, 10.21, -3.65), new THREE.Vector3(1.5, 12.2, 24.7), 1)
+    //controls.setCustomState(new THREE.Vector3(1.13, 10.21, -3.65), new THREE.Vector3(1.5, 12.2, 24.7), 1)
+    //controls.setCustomState(new THREE.Vector3(0.118, 10.866, -3.05), new THREE.Vector3(-0.21, 6.97, 22.29), 1)
+    controls.setCustomState(new THREE.Vector3(0.559, 13.43, -2.0), new THREE.Vector3(-0.19, 2.21, 21.02), 1)
 
 
 }
@@ -157,7 +158,6 @@ function particlesInit(x, y, z, len, packDist, isRight) {
         //let dataPoints = giveMeField(x, y, z, 30, 0.1)
     for (let i = 0; i < dataPoints.length; i++) {
         var p = new Particle(
-            particles.length,
             Math.floor(dataPoints[i].x),
             Math.floor(dataPoints[i].y),
             Math.floor(dataPoints[i].z),
@@ -191,8 +191,6 @@ function giveMeField(x, y, z, len, packDist, isRight) {
 
 function render() {
     controls.update()
-
-
     stats.begin();
 
     // Update particles only with 60fps in mind
@@ -201,19 +199,20 @@ function render() {
 
         // Skip the slow start
         if (frameCount < 60) {
-            // while (frameCount < 60) {
-            //     frameCount++;
-            //     updateParticles();
-            // }
+            while (frameCount < 10) {
+                frameCount++;
+                updateParticles();
+            }
         }
-        trailLengthShortener()
+
         updateParticles();
+        trailLengthShortener()
         delta = delta % interval;
     }
     updateBG()
     afterimagePass.uniforms['damp'].value = params.trailLen;
     updateMaterial();
-    //if (!params.noiseFreeze) frameCount++;
+    if (!params.noiseFreeze) frameCount++;
     composer.render();
     stats.end();
     // setTimeout(function() {
@@ -239,26 +238,22 @@ function updateParticles() {
             p.pos.y * params.noiseScale,
             p.pos.z * params.noiseScale + noiseOffset + frameCount * params.noiseSpeed
         );
-        let noise2 = numScale(noised, 0, 1, Math.PI / 6, -Math.PI / 6)
-        noise = numScale(Math.sin(p.life / 80), 1, -1, -Math.PI, Math.PI)
+        noise = scale(noised, 0, 1, -Math.PI / 3, 0)
         if (i == 1) {
-            // console.log(particles[0].pos.x + ", " + particles[0].pos.y)
-            // console.log(curveFunction(particles[0].life))
-            //console.log("N: " + noise + ", F: " + frameCount)
+            //console.log(noised)
 
         }
         //noise = noised * ((Math.PI * 2) - Math.PI);
-        p.angle.set(boolToDirection(p.isRight) * (noise2 * 0.9), 0, 0);
+        p.angle.set(noise * 0.1, boolToDirection(p.isRight) * noise, noise * 0.1);
         p.update();
     }
 }
 
-
+function scale(number, inMin, inMax, outMin, outMax) {
+    return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+}
 
 function updateMaterial() {
-    // material.needsUpdate = false
-    // mat2.needsUpdate = false
-    // mat3.needsUpdate = false
     material.color.setHex(params.particleColor);
     mat2.color.setHex(params.particleColor2);
     mat3.color.setHex(params.particleColor3);
@@ -317,14 +312,14 @@ const fitCameraToObject = function(camera, object, offset, controls) {
 
 function setupOrbit() {
     controls = new THREE.OrbitControls(camera, renderer.domElement);
-    lastState = controls.saveCustomState();
-    //controls.enableDamping = true;
-    // controls.minPan = new THREE.Vector3(30, -35, 7);
-    // controls.maxPan = new THREE.Vector3(80, 65, 30)
-    // controls.minDistance = 1
-    // controls.maxDistance = 107
-    // controls.enableRotate = false
-    //controls.autoRotate = true;
+    lastState = controls.saveCustomState()
+        //controls.enableDamping = true;
+        // controls.minPan = new THREE.Vector3(30, -35, 7);
+        // controls.maxPan = new THREE.Vector3(80, 65, 30)
+        // controls.minDistance = 1
+        // controls.maxDistance = 107
+        // controls.enableRotate = false
+        //controls.autoRotate = true;
 }
 
 

@@ -165,7 +165,7 @@
                 }
 
                 this.saveCustomState = function() {
-                    return { "target": scope.target, "position": scope.object.position, "zoom": scope.object.zoom }
+                    return { "target": scope.target.clone(), "position": scope.object.position.clone(), "zoom": scope.object.zoom }
                 }
 
                 this.rotate = function(rotateX, rotateY) {
@@ -181,7 +181,6 @@
                 }
 
                 this.update = function() {
-
                     const offset = new THREE.Vector3(); // so camera.up is the orbit axis
 
                     const quat = new THREE.Quaternion().setFromUnitVectors(object.up, new THREE.Vector3(0, 1, 0));
@@ -190,7 +189,6 @@
                     const lastQuaternion = new THREE.Quaternion();
                     const twoPI = 2 * Math.PI;
                     return function update() {
-
                         const position = scope.object.position;
                         offset.copy(position).sub(scope.target); // rotate offset to "y-axis-is-up" space
 
@@ -290,7 +288,6 @@
                             return true;
 
                         }
-
                         return false;
 
                     };
