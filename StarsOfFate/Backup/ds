@@ -1,0 +1,20 @@
+function shapeToLineSet(shape) { // Shape has to have at least 3 points
+    let lines = new lineSet();
+    let nextLine = new Line(shape.getNormalized(0), shape.getNormalized(1));
+    for (let i = 0; i < shape.length - 2;) { // Reference assignment might cause problmes look into that if it happens.
+        let thisLine = nextLine;
+        nextLine = new Line(shape.getNormalized(i + 1), shape.getNormalized(i + 2));
+        let angle = Line.getRadians(thisLine, nextLine);
+        let pointsSkipped = 1;
+        while (Math.abs(angle) < lineJointhreshold && i + pointsSkipped < shape.length - 2) {
+            thisLine = new Line(shape.getNormalized(i), shape.getNormalized(i + pointsSkipped + 1));
+            nextLine = new Line(shape.getNormalized(i + pointsSkipped + 1), shape.getNormalized(i + pointsSkipped + 2));
+            angle = Line.getRadians(thisLine, nextLine);
+            pointsSkipped++;
+        }
+        i += pointsSkipped;
+        lines.push(thisLine, angle);
+    }
+    lines.push(nextLine, 0);
+    return lines;
+}
