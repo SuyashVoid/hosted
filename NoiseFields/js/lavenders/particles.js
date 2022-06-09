@@ -61,6 +61,7 @@ var fieldParams = {
     sizeRandomness: 0.5,
     fieldCount: 2,
     distance: 45,
+    progressiveDecline: true,
     depth: 200
 
 }

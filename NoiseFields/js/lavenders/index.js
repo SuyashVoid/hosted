@@ -74,6 +74,7 @@ function setupGUI() {
     f5.add(params, 'particleMultiplier', 0.1, 3.5).onFinishChange(resetSystem);
     f5.add(params, 'sizeMultiplier', 0, 3).onChange(updateSizes);
     f5.add(fieldParams, 'fieldCount', 1, 5, 1).onFinishChange(resetSystem);
+    f5.add(fieldParams, 'progressiveDecline').onFinishChange(resetSystem);
     f5.add(fieldParams, 'depth', 50, 500, 1).onFinishChange(resetSystem);
     f5.add(fieldParams, 'distance', 10, 70).onFinishChange(resetSystem);
     f5.add(fieldParams, 'perspectiveDelta', 0, 0.3).onFinishChange(resetSystem)
@@ -187,7 +188,7 @@ function resetSystem() {
     // particlesInit(42, 0, 0, 180, 0.14, true, 0.4, 0.7, false)
     // particlesInit(40, 0, 0, 180, 0.14, false, 0.4, 0.7, false)
 
-    fieldSetter(fieldParams.fieldCount, fieldParams.distance, true)
+    fieldSetter(fieldParams.fieldCount, fieldParams.distance, params.progressiveDecline)
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
     geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
     geometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1).setUsage(THREE.DynamicDrawUsage));
