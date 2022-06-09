@@ -39,9 +39,10 @@ var params = {
     bgGradient2: "#5b86e5",
     bgAngle: 165,
     particleSkip: 2,
-    trailLen: 0.977,
-    tempTrailLen: 0.977,
+    trailLen: 0.975,
+    tempTrailLen: 0.975,
     animationDuration: 600,
+    shouldResetCam: false,
     Preset: 0,
     renderIterations() {
         particlesInit();
@@ -49,13 +50,13 @@ var params = {
 };
 
 var fieldParams = {
-    xFactor: 6.15,
+    xFactor: 7.15,
     yFactor: 2.7,
     yRandomness: 2.0,
-    lifeDivider: 500,
+    lifeDivider: 340,
     lifeVariancy: 0.55,
     strayParticles: 0.005,
-    maxFunctionTravel: 2.1,
+    maxFunctionTravel: 2.3,
     perspectiveDelta: 0.12,
     sizeRandomness: 0.5,
     fieldCount: 2,

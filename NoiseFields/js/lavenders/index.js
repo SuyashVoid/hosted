@@ -42,9 +42,10 @@ function setupGUI() {
     var f3A = f3.addFolder('Particles');
     var f4 = gui.addFolder('Field Particles')
     var f5 = gui.addFolder('Field')
+    gui.add(params, 'shouldResetCam')
 
 
-    f1.add(params, 'noiseScale', 0, 0.25);
+    f1.add(params, 'noiseScale', 0, 0.2);
     //f1.add(params, 'noiseSpeed', 0, 0.025);
     f1.add(params, 'noiseStrength', 0, 3);
     //f2.add(params, 'lifeLimit', 30, 400);
@@ -67,12 +68,12 @@ function setupGUI() {
     f4.add(fieldParams, 'lifeDivider', 100, 1000)
     f4.add(fieldParams, 'lifeVariancy', 0.1, 0.9).onFinishChange(resetSystem)
     f4.add(fieldParams, 'strayParticles', 0, 0.5).onFinishChange(resetSystem)
-    f4.add(fieldParams, 'maxFunctionTravel', 0, 3)
+    f4.add(fieldParams, 'maxFunctionTravel', 0, Math.PI)
     f4.add(fieldParams, 'sizeRandomness', 0.1, 0.9).onFinishChange(updateSizes)
 
-    f5.add(params, 'particleMultiplier', 0.1, 5).onFinishChange(resetSystem);
+    f5.add(params, 'particleMultiplier', 0.1, 3.5).onFinishChange(resetSystem);
     f5.add(params, 'sizeMultiplier', 0, 3).onChange(updateSizes);
-    f5.add(fieldParams, 'fieldCount', 1, 10, 1).onFinishChange(resetSystem);
+    f5.add(fieldParams, 'fieldCount', 1, 5, 1).onFinishChange(resetSystem);
     f5.add(fieldParams, 'depth', 50, 500, 1).onFinishChange(resetSystem);
     f5.add(fieldParams, 'distance', 10, 70).onFinishChange(resetSystem);
     f5.add(fieldParams, 'perspectiveDelta', 0, 0.3).onFinishChange(resetSystem)
@@ -165,6 +166,7 @@ function resize() {
 }
 
 function resetSystem() {
+    const firstTime = particles.length == 0
     particles = [];
     Wrule = GetAxiomTree();
     scene.remove.apply(scene, scene.children);
@@ -193,7 +195,8 @@ function resetSystem() {
     scene.add(particleSystem);
 
     // controls.setCustomState(new THREE.Vector3(1.13, 10.21, -3.65), new THREE.Vector3(1.5, 12.2, 24.7), 1)
-    controls.setCustomState(new THREE.Vector3(0.559, 13.43, -2.0), new THREE.Vector3(-0.19, 2.21, 21.02), 1)
+    if (params.shouldResetCam || firstTime)
+        controls.setCustomState(new THREE.Vector3(0.559, 13.43, -2.0), new THREE.Vector3(-0.19, 2.21, 21.02), 1)
     console.log("COUNT: " + particles.length)
 
 }
