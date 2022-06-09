@@ -23,7 +23,10 @@ let stats = new Stats();
 // Particles, Noise and plant displayed
 let particles = [];
 const simplex = new SimplexNoise();
+const simplex2 = new SimplexNoise();
 const fieldWidth = 4;
+
+
 // Render Constants
 let frameCount = 0;
 let noise = 0;
@@ -41,12 +44,14 @@ function setupGUI() {
     var f5 = gui.addFolder('Field')
 
 
-    f1.add(params, 'noiseScale', 0, 0.3);
-    f1.add(params, 'noiseSpeed', 0, 0.025);
-    f1.add(params, 'noiseStrength', 0, 1.1);
+    f1.add(params, 'noiseScale', 0, 0.25);
+    //f1.add(params, 'noiseSpeed', 0, 0.025);
+    f1.add(params, 'noiseStrength', 0, 3);
     //f2.add(params, 'lifeLimit', 30, 400);
     f2.add(params, 'tempTrailLen', 0.8, 1);
-    f2A.add(params, 'particleSpeed', 0, 0.2);
+    f2A.add(params, 'strayParticleSpeed', 0, 0.2);
+    f2A.add(params, 'strayNoiseScale', 0, 0.25);
+    f2A.add(params, 'strayNoiseSpeed', 0, 3);
     f3A.addColor(params, 'particleColor').onChange(updateColors);
     f3A.addColor(params, 'particleColor2').onChange(updateColors);
     f3A.addColor(params, 'particleColor3').onChange(updateColors);
@@ -58,6 +63,7 @@ function setupGUI() {
 
     f4.add(fieldParams, 'xFactor', 0, 15)
     f4.add(fieldParams, 'yFactor', 0, 5)
+    f4.add(fieldParams, 'yRandomness', 0, fieldParams.yFactor).onFinishChange(resetSystem)
     f4.add(fieldParams, 'lifeDivider', 100, 1000)
     f4.add(fieldParams, 'lifeVariancy', 0.1, 0.9).onFinishChange(resetSystem)
     f4.add(fieldParams, 'strayParticles', 0, 0.5).onFinishChange(resetSystem)
@@ -69,9 +75,9 @@ function setupGUI() {
     f5.add(fieldParams, 'fieldCount', 1, 10, 1).onFinishChange(resetSystem);
     f5.add(fieldParams, 'depth', 50, 500, 1).onFinishChange(resetSystem);
     f5.add(fieldParams, 'distance', 10, 70).onFinishChange(resetSystem);
-    f5.add(fieldParams, 'perspectiveDelta', 0, 0.2).onFinishChange(resetSystem)
+    f5.add(fieldParams, 'perspectiveDelta', 0, 0.3).onFinishChange(resetSystem)
 
-    f1.close()
+    //f1.close()
     f2.close()
     f3.close()
     f3B.close()
@@ -197,11 +203,11 @@ function fieldSetter(fieldCount, distance, progressiveDecline) {
     const basePack = 0.08
     for (let i = 1; i <= fieldCount; i++) {
         let dist = (i - 1) * (distance - (fieldWidth * 3 * i / 4));
-        if (i == 1) dist = 10
+        if (i == 1) dist = distance / 4
         let decline = 1;
         if (progressiveDecline) {
-            decline = Math.pow(1 - ((i - 1) / (fieldCount + 2)), 0.91);
-            console.log("Dec: " + decline)
+            decline = Math.pow(1 - ((i - 1) / (fieldCount + 1)), 0.91);
+            //console.log("Dec: " + decline)
         }
 
         particlesInit(dist + (fieldWidth / 2), 0, 0, baseDepth, basePack, true, 1 * decline / 2, 1 * decline, true)
@@ -249,7 +255,7 @@ function giveMeField(x, y, z, len, packDist, isRight, unite) {
         const xRandom = Math.random() * (fieldWidth + xOffset) - ((fieldWidth + xOffset) / 2)
         let zOffset = -1 * Math.pow(i, 0.91) * packDist;
         // Reduces the number of particles after 60% distance
-        if (i > particleCount * 0.6) {
+        if (i > particleCount * 0.3) {
             if (Math.random() > i / particleCount)
                 toReturn.push(new THREE.Vector3(x + xOffset + xRandom, y, z + zOffset))
         } else toReturn.push(new THREE.Vector3(x + xOffset + xRandom, y, z + zOffset))
@@ -294,39 +300,29 @@ function trailLengthShortener() {
     lastState = currentState
 }
 
-function updateParticles() {
-    for (var i = 0; i < particles.length; i++) {
-        var p = particles[i];
-        let noised = simplex.noise4D(
-            p.pos.x * params.noiseScale,
-            p.pos.y * params.noiseScale,
-            p.pos.z * params.noiseScale,
-            noiseOffset + frameCount * params.noiseSpeed
-        );
-        noise = numScale(noised, 0, 1, Math.PI / 6, -Math.PI / 6)
-        let noise2 = numScale(Math.sin(p.life / 80), 1, -1, -Math.PI, Math.PI)
-        if (i == 1) {}
-        //noise = noised * ((Math.PI * 2) - Math.PI);
-        p.angle.set(boolToDirection(p.isRight) * (noise), noise * 0.1, 0);
-        const pD = p.update();
-        p.mesh.position.set(pD.x, pD.y, pD.z)
-    }
-}
 
 function updateParticles2() {
     const pos = geometry.attributes.position.array;
     for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
-        let noised = simplex.noise4D(
+        if (p.shouldRun) {
+            let noised = simplex.noise4D(
+                p.pos.x * params.strayNoiseScale,
+                p.pos.y * params.strayNoiseScale,
+                p.pos.z * params.strayNoiseScale,
+                noiseOffset + frameCount * params.strayNoiseSpeed
+            );
+            noise = numScale(noised, 0, 1, Math.PI, -Math.PI)
+            p.angle.set(0, noise, 0);
+        }
+
+        p.noise = simplex2.noise4D(
             p.pos.x * params.noiseScale,
             p.pos.y * params.noiseScale,
             p.pos.z * params.noiseScale,
-            noiseOffset + frameCount * params.noiseSpeed
+            noiseOffset + (frameCount * params.noiseSpeed)
         );
-        noise = numScale(noised, 0, 1, Math.PI, -Math.PI)
-        let noise2 = numScale(Math.sin(p.life / 80), 1, -1, -Math.PI, Math.PI)
 
-        p.angle.set(0, noise, 0);
         const posit = p.update()
         pos[i * 3] = posit.x;
         pos[i * 3 + 1] = posit.y;

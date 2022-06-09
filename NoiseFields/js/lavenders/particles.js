@@ -21,12 +21,14 @@ var params = {
     lifeLimit: 150,
     noiseScale: 0.0587,
     noiseSpeed: 0.003,
-    noiseStrength: 0.3412,
+    noiseStrength: 1.2,
     noiseFreeze: false,
     particleCount: 0,
     sizeMultiplier: 1.5,
     particleMultiplier: 1,
-    particleSpeed: 0.032,
+    strayParticleSpeed: 0.032,
+    strayNoiseScale: 0.058,
+    strayNoiseSpeed: 0.003,
     particleColor: 0xee00ff,
     // opacity: 0.65,
     particleColor2: 0x4400ff,
@@ -47,8 +49,9 @@ var params = {
 };
 
 var fieldParams = {
-    xFactor: 5.15,
-    yFactor: 2.3,
+    xFactor: 6.15,
+    yFactor: 2.7,
+    yRandomness: 2.0,
     lifeDivider: 500,
     lifeVariancy: 0.55,
     strayParticles: 0.005,
@@ -70,7 +73,7 @@ class Particle {
         this.baseLife = Math.floor((Math.random() * params.lifeLimit * 0.3) - params.lifeLimit * 0.15);
         this.scaleFactor = Math.random() * 0.2 + 1;
         this.life = Math.random() * params.lifeLimit * 0.45;
-        this.ySpeed = Math.random() * 2.0 + 0.7;
+        this.ySpeed = Math.random() * fieldParams.yRandomness + (fieldParams.yFactor - fieldParams.yRandomness);
         this.size = Math.random() * fieldParams.sizeRandomness + (1 - fieldParams.sizeRandomness);
         this.ex = x;
         this.ey = y;
@@ -80,6 +83,7 @@ class Particle {
         this.vel = new THREE.Vector3(0, 0, 0);
         this.acc = new THREE.Vector3(0, 0, 0);
         this.angle = new THREE.Euler(0, 0, 0);
+        this.noise = 0;
         //this.shouldChangeHue = Math.random() < 0.66;
         this.lifeLimitRandomNess = Math.random() * (params.lifeLimit * fieldParams.lifeVariancy)
             //this.randomBoundaryOffset = -params.size / 1.2;
@@ -116,8 +120,8 @@ class Particle {
             this.acc.applyEuler(this.angle);
             this.acc.multiplyScalar(params.noiseStrength);
 
-            this.acc.clampLength(0, params.particleSpeed);
-            this.vel.clampLength(0, params.particleSpeed);
+            this.acc.clampLength(0, params.strayParticleSpeed);
+            this.vel.clampLength(0, params.strayParticleSpeed);
             this.vel.add(this.acc);
             this.pos.add(this.vel);
             posVect.copy(this.pos)
@@ -133,6 +137,15 @@ class Particle {
 
             this.pos.y = this.ey + y * this.ySpeed * this.scaleFactor * fieldParams.yFactor * this.yMultiplier;
             this.pos.z = this.ez
+
+            this.noise = numScale(this.noise, -1, 1, 0, params.noiseStrength)
+                //if (this.id == 22) console.log(this.noise)
+                // this.pos.x += this.noise
+                // this.pos.y += this.noise
+                // this.pos.z += this.noise / 2
+            const noiseVec = new THREE.Vector3(this.noise, this.noise, this.noise / 2)
+                //noiseVec.clampLength(0, params.particleSpeed * 15);
+            this.pos.add(noiseVec)
         }
 
 
