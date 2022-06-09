@@ -8,60 +8,75 @@ const fpsLimit = 60;
 let clock = new THREE.Clock();
 let delta = 0;
 let interval = 1 / 60;
-var scene;
-var camera;
-var renderer;
+let scene;
+let camera;
+let renderer;
+let uniforms;
+let shaderMaterial;
+let geometry;
+let particleSystem;
 // Materials
 let composer;
 let afterimagePass;
 // Stats
-var stats = new Stats();
+let stats = new Stats();
 // Particles, Noise and plant displayed
-var particles = [];
+let particles = [];
 const simplex = new SimplexNoise();
+const fieldWidth = 4;
 // Render Constants
-var frameCount = 0;
-var noise = 0;
-var noiseOffset = Math.random() * 3;
+let frameCount = 0;
+let noise = 0;
+let noiseOffset = Math.random() * 3;
 
 function setupGUI() {
 
     gui = new lil.GUI;
     var f1 = gui.addFolder('Flow Field');
     var f2 = gui.addFolder('Particles');
+    var f2A = f2.addFolder('Stray Particles');
     var f3 = gui.addFolder('Colors');
     var f3A = f3.addFolder('Particles');
+    var f4 = gui.addFolder('Field Particles')
+    var f5 = gui.addFolder('Field')
 
-    f1.add(params, 'size', 1, 25).onFinishChange(resetSystem);
-    f1.add(params, 'noiseScale', 0, 0.1);
+
+    f1.add(params, 'noiseScale', 0, 0.3);
     f1.add(params, 'noiseSpeed', 0, 0.025);
-    f1.add(params, 'noiseStrength', 0, 4);
-    //f1.add(params, 'noiseFreeze');
-    //f2.add(params, 'particleCount', 0, 15000).onFinishChange(resetSystem);
-    f2.add(params, 'particleSize', 0, 1);
-    f2.add(params, 'lifeLimit', 30, 400);
-    f2.add(params, 'particleSpeed', 0, 0.2);
-    f2.add(params, 'trailLen', 0.8, 1).onFinishChange(trailLenReflector);
-    f3A.addColor(params, 'particleColor');
-    f3A.add(params, 'opacity', 0, 1);
-    f3A.addColor(params, 'particleColor2');
-    f3A.add(params, 'opacity2', 0, 1);
-    f3A.addColor(params, 'particleColor3');
-    f3A.add(params, 'opacity3', 0, 1);
+    f1.add(params, 'noiseStrength', 0, 1.1);
+    //f2.add(params, 'lifeLimit', 30, 400);
+    f2.add(params, 'tempTrailLen', 0.8, 1);
+    f2A.add(params, 'particleSpeed', 0, 0.2);
+    f3A.addColor(params, 'particleColor').onChange(updateColors);
+    f3A.addColor(params, 'particleColor2').onChange(updateColors);
+    f3A.addColor(params, 'particleColor3').onChange(updateColors);
 
     var f3B = f3.addFolder('Background');
     f3B.addColor(params, 'bgGradient1');
     f3B.addColor(params, 'bgGradient2');
     f3B.add(params, 'bgAngle', 0, 360, 1)
 
-    f1.close()
-        // f2.close()
-        // f3.close()
-    gui.close()
-}
+    f4.add(fieldParams, 'xFactor', 0, 15)
+    f4.add(fieldParams, 'yFactor', 0, 5)
+    f4.add(fieldParams, 'lifeDivider', 100, 1000)
+    f4.add(fieldParams, 'lifeVariancy', 0.1, 0.9).onFinishChange(resetSystem)
+    f4.add(fieldParams, 'strayParticles', 0, 0.5).onFinishChange(resetSystem)
+    f4.add(fieldParams, 'maxFunctionTravel', 0, 3)
+    f4.add(fieldParams, 'sizeRandomness', 0.1, 0.9).onFinishChange(updateSizes)
 
-function trailLenReflector() {
-    params.tempTrailLen = params.trailLen
+    f5.add(params, 'particleMultiplier', 0.1, 5).onFinishChange(resetSystem);
+    f5.add(params, 'sizeMultiplier', 0, 3).onChange(updateSizes);
+    f5.add(fieldParams, 'fieldCount', 1, 10, 1).onFinishChange(resetSystem);
+    f5.add(fieldParams, 'depth', 50, 500, 1).onFinishChange(resetSystem);
+    f5.add(fieldParams, 'distance', 10, 70).onFinishChange(resetSystem);
+    f5.add(fieldParams, 'perspectiveDelta', 0, 0.2).onFinishChange(resetSystem)
+
+    f1.close()
+    f2.close()
+    f3.close()
+    f3B.close()
+        //f4.close()
+        //gui.close()
 }
 
 
@@ -86,6 +101,23 @@ function setupRenderer() {
     afterimagePass = new AfterimagePass();
     afterimagePass.uniforms['damp'].value = params.trailLen;
     composer.addPass(afterimagePass);
+
+    uniforms = {
+
+        pointTexture: { value: new THREE.TextureLoader().load('textures/disc.png') }
+
+    };
+    shaderMaterial = new THREE.ShaderMaterial({
+        uniforms: uniforms,
+        vertexShader: document.getElementById('vertexshader').textContent,
+        fragmentShader: document.getElementById('fragmentshader').textContent,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
+        opacity: 0.3,
+        depthTest: false,
+        vertexColors: true
+
+    });
 
     stats.showPanel(0);
     document.body.appendChild(stats.dom);
@@ -129,61 +161,99 @@ function resize() {
 function resetSystem() {
     particles = [];
     Wrule = GetAxiomTree();
-    pointGeometry = new THREE.Geometry()
-    pointGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
     scene.remove.apply(scene, scene.children);
     frameCount = 0;
-    particlesInit(12, 0, 0, 180, 0.13, true)
-    particlesInit(10, 0, 0, 180, 0.13, false)
-        // particlesInit(35, 0, 0, 180, 0.38, true)
-    particlesInit(-10, 0, 0, 180, 0.13, true)
-    particlesInit(-12, 0, 0, 180, 0.13, false)
 
-    // particlesInit(-40, 0, 0, 180, 0.17, false)
-    // particlesInit(-42, 0, 0, 180, 0.17, true)
+    geometry = new THREE.BufferGeometry();
 
-    // particlesInit(42, 0, 0, 180, 0.17, true)
-    // particlesInit(40, 0, 0, 180, 0.17, false)
-    // particlesInit(-35, 0, 0, 180, 0.38, false)
+    positions = [];
+    colors = [];
+    sizes = [];
+    // particlesInit(12, 0, 0, 200, 0.08, true, 1, 1.2, false)
+    // particlesInit(10, 0, 0, 200, 0.08, false, 1, 1.1, true)
+    // particlesInit(-10, 0, 0, 200, 0.08, true, 1, 1, true)
+    // particlesInit(-12, 0, 0, 200, 0.08, false, 1, 1, false)
 
-    controls.setCustomState(new THREE.Vector3(1.13, 10.21, -3.65), new THREE.Vector3(1.5, 12.2, 24.7), 1)
+    // particlesInit(-40, 0, 0, 180, 0.14, false, 0.4, 0.7, false)
+    // particlesInit(-42, 0, 0, 180, 0.14, true, 0.4, 0.7, false)
+    // particlesInit(42, 0, 0, 180, 0.14, true, 0.4, 0.7, false)
+    // particlesInit(40, 0, 0, 180, 0.14, false, 0.4, 0.7, false)
 
+    fieldSetter(fieldParams.fieldCount, fieldParams.distance, true)
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    geometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1).setUsage(THREE.DynamicDrawUsage));
+    particleSystem = new THREE.Points(geometry, shaderMaterial);
+    scene.add(particleSystem);
+
+    // controls.setCustomState(new THREE.Vector3(1.13, 10.21, -3.65), new THREE.Vector3(1.5, 12.2, 24.7), 1)
+    controls.setCustomState(new THREE.Vector3(0.559, 13.43, -2.0), new THREE.Vector3(-0.19, 2.21, 21.02), 1)
+    console.log("COUNT: " + particles.length)
 
 }
 
+function fieldSetter(fieldCount, distance, progressiveDecline) {
+    const baseDepth = fieldParams.depth
+    const basePack = 0.08
+    for (let i = 1; i <= fieldCount; i++) {
+        let dist = (i - 1) * (distance - (fieldWidth * 3 * i / 4));
+        if (i == 1) dist = 10
+        let decline = 1;
+        if (progressiveDecline) {
+            decline = Math.pow(1 - ((i - 1) / (fieldCount + 2)), 0.91);
+            console.log("Dec: " + decline)
+        }
 
-function particlesInit(x, y, z, len, packDist, isRight) {
-    let dataPoints = giveMeField(x, y, z, len, packDist, isRight)
-        //let dataPoints = giveMeField(x, y, z, 30, 0.1)
+        particlesInit(dist + (fieldWidth / 2), 0, 0, baseDepth, basePack, true, 1 * decline / 2, 1 * decline, true)
+        particlesInit(dist, 0, 0, baseDepth, basePack, false, 1 * decline / 2, 1 * decline, true)
+
+        particlesInit(-1 * dist, 0, 0, baseDepth, basePack, true, 1 * decline / 2, 1 * decline, true)
+        particlesInit(-1 * dist - (fieldWidth / 2), 0, 0, baseDepth, basePack, false, 1 * decline / 2, 1 * decline, true)
+
+    }
+}
+
+
+
+
+function particlesInit(x, y, z, len, packDist, isRight, xMultiplier, yMultiplier, unite) {
+    let dataPoints = giveMeField(x, y, z, len, packDist / params.particleMultiplier, isRight, unite)
+
     for (let i = 0; i < dataPoints.length; i++) {
         var p = new Particle(
             particles.length,
             Math.floor(dataPoints[i].x),
             Math.floor(dataPoints[i].y),
             Math.floor(dataPoints[i].z),
-            isRight
+            isRight,
+            xMultiplier,
+            yMultiplier
         );
-        p.init(scene);
+        p.init();
+        //if (p.shouldRun)
         particles.push(p);
-        if (i == dataPoints.length) fitCameraToObject(camera, p.mesh, 2, controls)
+        //if (i == dataPoints.length) fitCameraToObject(camera, p.mesh, 2, controls)
     }
 
 }
 
 
-function giveMeField(x, y, z, len, packDist, isRight) {
-    const fieldWidth = 4;
-    const xDelta = 0
+function giveMeField(x, y, z, len, packDist, isRight, unite) {
     let toReturn = []
     const particleCount = len / packDist;
     for (let i = 0; i < particleCount; i++) {
-        const xRandom = Math.random() * fieldWidth - (fieldWidth / 2)
         let xOffset = 0
-        if (i > particleCount * 0.3) {
-            xOffset = i * boolToDirection(isRight) * -1 * xDelta / 40;
+        if (i > particleCount * 0.01 && unite) {
+            xOffset = i * boolToDirection(x <= 0) * fieldParams.perspectiveDelta / 40 + (-x / 20);
         }
+        const xRandom = Math.random() * (fieldWidth + xOffset) - ((fieldWidth + xOffset) / 2)
         let zOffset = -1 * Math.pow(i, 0.91) * packDist;
-        toReturn.push(new THREE.Vector3(x + xOffset + xRandom, y, z + zOffset))
+        // Reduces the number of particles after 60% distance
+        if (i > particleCount * 0.6) {
+            if (Math.random() > i / particleCount)
+                toReturn.push(new THREE.Vector3(x + xOffset + xRandom, y, z + zOffset))
+        } else toReturn.push(new THREE.Vector3(x + xOffset + xRandom, y, z + zOffset))
+
     }
     return toReturn;
 }
@@ -191,15 +261,12 @@ function giveMeField(x, y, z, len, packDist, isRight) {
 
 function render() {
     controls.update()
-
-
     stats.begin();
 
     // Update particles only with 60fps in mind
     delta += clock.getDelta();
     if (delta > interval) {
 
-        // Skip the slow start
         if (frameCount < 60) {
             // while (frameCount < 60) {
             //     frameCount++;
@@ -207,17 +274,13 @@ function render() {
             // }
         }
         trailLengthShortener()
-        updateParticles();
+        updateParticles2();
         delta = delta % interval;
     }
     updateBG()
     afterimagePass.uniforms['damp'].value = params.trailLen;
-    updateMaterial();
-    //if (!params.noiseFreeze) frameCount++;
     composer.render();
     stats.end();
-    // setTimeout(function() {
-    // }, 1000 / 60);
     requestAnimationFrame(render);
 }
 
@@ -234,25 +297,67 @@ function trailLengthShortener() {
 function updateParticles() {
     for (var i = 0; i < particles.length; i++) {
         var p = particles[i];
-        let noised = simplex.noise3D(
+        let noised = simplex.noise4D(
             p.pos.x * params.noiseScale,
             p.pos.y * params.noiseScale,
-            p.pos.z * params.noiseScale + noiseOffset + frameCount * params.noiseSpeed
+            p.pos.z * params.noiseScale,
+            noiseOffset + frameCount * params.noiseSpeed
         );
-        let noise2 = numScale(noised, 0, 1, Math.PI / 6, -Math.PI / 6)
-        noise = numScale(Math.sin(p.life / 80), 1, -1, -Math.PI, Math.PI)
-        if (i == 1) {
-            // console.log(particles[0].pos.x + ", " + particles[0].pos.y)
-            // console.log(curveFunction(particles[0].life))
-            //console.log("N: " + noise + ", F: " + frameCount)
-
-        }
+        noise = numScale(noised, 0, 1, Math.PI / 6, -Math.PI / 6)
+        let noise2 = numScale(Math.sin(p.life / 80), 1, -1, -Math.PI, Math.PI)
+        if (i == 1) {}
         //noise = noised * ((Math.PI * 2) - Math.PI);
-        p.angle.set(boolToDirection(p.isRight) * (noise2 * 0.9), 0, 0);
-        p.update();
+        p.angle.set(boolToDirection(p.isRight) * (noise), noise * 0.1, 0);
+        const pD = p.update();
+        p.mesh.position.set(pD.x, pD.y, pD.z)
     }
 }
 
+function updateParticles2() {
+    const pos = geometry.attributes.position.array;
+    for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        let noised = simplex.noise4D(
+            p.pos.x * params.noiseScale,
+            p.pos.y * params.noiseScale,
+            p.pos.z * params.noiseScale,
+            noiseOffset + frameCount * params.noiseSpeed
+        );
+        noise = numScale(noised, 0, 1, Math.PI, -Math.PI)
+        let noise2 = numScale(Math.sin(p.life / 80), 1, -1, -Math.PI, Math.PI)
+
+        p.angle.set(0, noise, 0);
+        const posit = p.update()
+        pos[i * 3] = posit.x;
+        pos[i * 3 + 1] = posit.y;
+        pos[i * 3 + 2] = posit.z;
+    }
+    geometry.attributes.position.needsUpdate = true;
+}
+
+function updateSizes() {
+    const siz = geometry.attributes.size.array;
+    for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.size = Math.random() * fieldParams.sizeRandomness + (1 - fieldParams.sizeRandomness)
+        siz[i] = particles[i].size * params.sizeMultiplier
+    }
+    geometry.attributes.size.needsUpdate = true;
+}
+
+function updateColors() {
+    const col = geometry.attributes.color.array;
+    let color;
+    for (let i = 0; i < particles.length; i++) {
+        if (particles[i].colorIndex == 0) color = new THREE.Color(params.particleColor);
+        else if (particles[i].colorIndex == 1) color = new THREE.Color(params.particleColor2);
+        else color = new THREE.Color(params.particleColor3);
+        col[i * 3] = color.r;
+        col[i * 3 + 1] = color.g;
+        col[i * 3 + 2] = color.b;
+    }
+    geometry.attributes.color.needsUpdate = true;
+}
 
 
 function updateMaterial() {
@@ -330,7 +435,6 @@ function setupOrbit() {
 
 setupGUI()
 setupRenderer();
-setupMaterials();
 setupOrbit();
 resize();
 window.addEventListener('resize', resize, false);

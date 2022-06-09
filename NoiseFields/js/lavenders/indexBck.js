@@ -236,7 +236,7 @@ function updateParticles() {
         let noised = simplex.noise3D(
             p.pos.x * params.noiseScale,
             p.pos.y * params.noiseScale,
-            p.pos.z * params.noiseScale + noiseOffset + frameCount * params.noiseSpeed
+            p.pos.z * params.noiseScale + noiseOffset + frameCount * params.noiseSpeed + Math.random() * params.noiseSpeed
         );
         noise = scale(noised, 0, 1, -Math.PI / 3, 0)
         if (i == 1) {
