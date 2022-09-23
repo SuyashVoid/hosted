@@ -1,11 +1,6 @@
-import {
-	Color
-} from './three.module.js';
-import { Pass } from './Pass.js';
+THREE.RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
 
-var RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
-
-	Pass.call( this );
+	THREE.Pass.call( this );
 
 	this.scene = scene;
 	this.camera = camera;
@@ -18,13 +13,13 @@ var RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAl
 	this.clear = true;
 	this.clearDepth = false;
 	this.needsSwap = false;
-	this._oldClearColor = new Color();
+	this._oldClearColor = new THREE.Color();
 
 };
 
-RenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
+THREE.RenderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 
-	constructor: RenderPass,
+	constructor: THREE.RenderPass,
 
 	render: function ( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
 
@@ -79,5 +74,3 @@ RenderPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 	}
 
 } );
-
-export { RenderPass };

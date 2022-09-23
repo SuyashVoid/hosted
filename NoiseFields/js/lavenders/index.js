@@ -1,6 +1,6 @@
-import { EffectComposer } from '../libs/postprocessing/EffectComposer.js';
-import { RenderPass } from '../libs/postprocessing/RenderPass.js';
-import { AfterimagePass } from '../libs/postprocessing/AfterimagePass.js';
+import { EffectComposer } from '../libs/EffectComposer.js';
+import { RenderPass } from '../libs/RenderPass.js';
+import { AfterimagePass } from '../libs/AfterimagePass.js';
 // Coolor constants (can be integrated)
 var gui;
 // Scene global variables
