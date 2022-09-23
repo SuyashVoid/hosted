@@ -1,6 +1,6 @@
-import { EffectComposer } from 'https://unpkg.com/three@0.126.0/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'https://unpkg.com/three@0.126.0/examples/jsm/postprocessing/RenderPass.js';
-import { AfterimagePass } from 'https://unpkg.com/three@0.126.0/examples/jsm/postprocessing/AfterimagePass.js';
+import { EffectComposer } from '../libs/EffectComposer.js';
+import { RenderPass } from '../libs/RenderPass.js';
+import { AfterimagePass } from '../libs/AfterimagePass';
 // Coolor constants (can be integrated)
 var gui;
 // Scene global variables
