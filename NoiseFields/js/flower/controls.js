@@ -15,6 +15,7 @@ window.addEventListener('load', e => {
     flowerFolder.add(params, 'hue', 0, 360, 1).onFinishChange(reset);
     flowerFolder.add(params, 'hueVariance', 0, 120, 1).onFinishChange(reset);
     flowerFolder.add(params, 'hueRange', 0, 90, 1).onFinishChange(reset);
+    flowerFolder.add(params, 'speed', 0.1, 2 );
     //flowerFolder.add(params, 'lightness', 0, 100, 1).onFinishChange(reset);
     flowerFolder.add(params, 'invert').onFinishChange(reset);;
     flowerFolder.close();
@@ -27,5 +28,3 @@ function reset() {
 function reCreateFlowers() {
     generatorA.resetFlowers();
 }
-
-//flowers.close();

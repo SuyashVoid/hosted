@@ -323,7 +323,7 @@ class Generator {
             while (i--) {
                 let mesh = flower.meshes[i];
                 mesh.material.uniforms.opacity.value = Calc.clamp(flower.progressEffective * 2, 0, 1);
-                mesh.material.uniforms.visibility.value = flower.progressEased;
+                mesh.material.uniforms.visibility.value = flower.progressEffective;
                 
             }
 
