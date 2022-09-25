@@ -28,15 +28,6 @@ Flower Generation (Technical):
     - I am making multiple flowers, each with their own animation speed, so that the flowers are not all in sync. This is done by creating a new flower class for each flower and then pushing it into an array. The render function then iterates through each flower and updates its animation.
     - AR is handled by three.js's ARButton.js library. This library is responsible for creating the AR button and setting up the AR session. It also handles the rendering of the scene to the AR camera.
 
-
-    Something to remember about three.js and webXR is that it needs to use renderer.setAnimationLoop() instead of requestAnimationFrame() to render the scene. This is because the AR session is handled by the browser and not the renderer. So, the renderer needs to be told to render the scene every time the browser updates the AR camera. This is done by using renderer.setAnimationLoop() instead of requestAnimationFrame(). (Last 2 sentences are A.I generated, they probably are correct).
-
-    Do it just like this:
-        this.renderer.setAnimationLoop(() => {
-            this.loop();
-        });
-    I made the mistake by not passing in the loop function as a CALLBACK to setAnimationLoop() and it took me a while to figure out why the scene wasn't rendering.
-    
 */
 
 
@@ -54,12 +45,11 @@ var params = {
     hueRange: 90,
     lightness: 60,
     speed: 1,
-    invert: false,
-    spreadFactor: 40,
+    invert: false
 };
-var stats = new Stats();
-stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-document.body.appendChild(stats.dom);
+//var stats = new Stats();
+//stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+//document.body.appendChild(stats.dom);
 let progMax = -210;
 let now = 0;
 let then = 0;
@@ -126,17 +116,13 @@ class Flower {
         this.scene = scene;
         this.setupLines();
         this.reset();
-        this.setPosition();
+        this.baseX = Math.random() * 50 - 25;
+        this.baseY = Math.random() * 50 - 25;
+        this.baseZ = Math.random() * 40 - 20;
         this.duration = Math.random() * 0.4 + 1.0;
         this.progressSpeed = Math.random() * 0.005 + 0.004;
         this.easeSpeed = Math.random() * 1.0 + 0.5;
         ///this.basePos = new THREE.Vector3(Math.random() * 100, Math.random() * 100, Math.random() * 100);
-    }
-
-    setPosition(){
-        this.baseX = Math.random() * (params.spreadFactor * 1.25) - (params.spreadFactor / 2);
-        this.baseY = Math.random() * (params.spreadFactor*1.25) - (params.spreadFactor / 2);
-        this.baseZ = Math.random() * params.spreadFactor - (params.spreadFactor / 2);
     }
 
     setupLines() {
@@ -242,7 +228,6 @@ class Flower {
         this.progressModulo = 0; // resets progress on modulus
         this.progressEffective = 0; // progress amount to use
         this.progressEased = 0; // eased progress
-        this.setPosition();
         this.generate();
 
     }
@@ -251,31 +236,28 @@ class Flower {
 class Generator {
 
     constructor() {
-        this.setupCamera();
-        this.setupScene();
         this.setupRenderer();
-        this.setupOrbit();
+        this.setupCamera();
         this.listen();
         this.onResize();
-        this.init();
-        this.reset();
+        //this.init();
+        //this.reset();
         then = Date.now();
-        this.loop();
-        //this.setupDummy();
+        //this.loop();
+        this.animate();
+        this.setupXR();
     }
 
-    setupDummy() {
+    setupXR() {
         let sphere = new THREE.BoxGeometry(10, 10, 10);
         // let sphere = new THREE.SphereGeometry(4.5, 32, 32);
         let material = new THREE.MeshBasicMaterial({color: 0xff0000});
         let sphMesh = new THREE.Mesh(sphere, material);
-        this.scene.add(sphMesh);        
+        this.scene.add(sphMesh);                        
     }
 
-    animate() {        
-        this.renderer.setAnimationLoop(() => {
-            this.loop();
-          });
+    animate(){
+        this.renderer.setAnimationLoop(this.loop2());
     }
 
 
@@ -289,54 +271,74 @@ class Generator {
     setupCamera() {
         this.fov = 75;
         this.camera = new THREE.PerspectiveCamera(this.fov, 0, 0.01, 1000);
-        this.camera.position.set(0,0,50);
-        //this.camera.position.z = 10;
+         this.camera.position.set(0,0,50);
+        // this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);        
+        // this.controls.minDistance = 0;
+        // this.controls.maxDistance = 8;
     }
 
-    setupScene() {
-        this.scene = new THREE.Scene();
-    }
 
     setupRenderer() {
-        this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
-        this.renderer.outputEncoding = THREE.sRGBEncoding;
-		this.renderer.xr.enabled = true;
+        let container = document.createElement( 'div' );
+        document.body.appendChild( container );
 
-        document.body.appendChild(this.renderer.domElement);
-        document.body.appendChild( ARButton.createButton( this.renderer ) );
+        this.scene = new THREE.Scene();
+
+        this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+        this.renderer.outputEncoding = THREE.sRGBEncoding;		
+        //this.renderer.xr.enabled = true;
+
+        container.appendChild( this.renderer.domElement );
+        //document.body.appendChild( ARButton.createButton( this.renderer ) );
     }
 
     setupOrbit() {
-        this.orbit = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-        // this.orbit.enableDamping = true;
-        // this.orbit.dampingFactor = 0.2;
-        // this.orbit.enableKeys = false;
+        
     }
 
-    worldToScreen(vector, camera) {
-        vector.project(camera);
-        let cx = window.innerWidth / 2;
-        let cy = window.innerHeight / 2;
-        vector.x = vector.x * cx + cx;
-        vector.y = -(vector.y * cy) + cy;
-        return vector;
-    }
+    // worldToScreen(vector, camera) {
+    //     vector.project(camera);
+    //     let cx = window.innerWidth / 2;
+    //     let cy = window.innerHeight / 2;
+    //     vector.x = vector.x * cx + cx;
+    //     vector.y = -(vector.y * cy) + cy;
+    //     return vector;
+    // }
 
-    resetFlowers() {        
+    resetFlowers() {
+        // while (this.scene.children.length > 0) {
+        //     this.scene.remove(this.scene.children[0]);
+        // }
         this.scene.remove.apply(this.scene, this.scene.children);
         this.init()
         this.reset()
     }
 
     reset() {
-
-        //Removed for transparent BG for AR
-        // this.scene.background = params.invert ? new THREE.Color('#fff') : new THREE.Color('0x000000');
-        // this.camera.position.set(0, 0, 50);        
+        // reset the camera        
+        this.scene.background = params.invert ? new THREE.Color('#fff') : new THREE.Color('#000');
+        // this.camera.position.x = 0;
+        // this.camera.position.y = 0;
+        // this.camera.position.z = 50;
         // this.camera.lookAt(new THREE.Vector3());
         for (let i = 0; i < this.flowers.length; i++) {
             this.flowers[i].reset();
         }
+
+        // requestAnimationFrame(() => {
+        //     // scale until the flower roughly fits within the viewport
+        //     let tick = 0;
+        //     let exit = 50;
+        //     let scale = 1;
+        //     this.meshGroup.scale.set(scale, scale, scale);
+        //     let scr = this.worldToScreen(new THREE.Vector3(0, this.edge, 0), this.camera);
+        //     while (scr.y < window.innerHeight * 0.2 && tick <= exit) {
+        //         scale -= 0.05;
+        //         scr = this.worldToScreen(new THREE.Vector3(0, this.edge * scale, 0), this.camera);
+        //         tick++;
+        //     }
+        //     this.meshGroupScaleTarget = scale;
+        // });
     }
 
     listen() {
@@ -347,18 +349,24 @@ class Generator {
         this.resolution = new THREE.Vector2(window.innerWidth, window.innerHeight);
         this.dpr = window.devicePixelRatio > 1 ? 2 : 1;
 
-        this.camera.aspect = this.resolution.x / this.resolution.y;
+        this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
 
         this.renderer.setPixelRatio(this.dpr);
-        this.renderer.setSize(this.resolution.x, this.resolution.y);
+        this.renderer.setSize( window.innerWidth, window.innerHeight );
     }
 
-    loop() {                    
-            stats.begin();
+    loop() {        
+            
+            // stats.begin();
             for (let iter = 0; iter < this.flowers.length; iter++) {
 
-                const flower = this.flowers[iter];                
+                const flower = this.flowers[iter];
+                // if (flower.progress > progMax) {
+                //     progMax = flower.progress;
+                //     console.log(progMax)
+                // }
+                //Subtle rotation of flowers
                 flower.meshGroup.rotation.x = Math.cos(Date.now() * 0.001) * 0.1;
                 flower.meshGroup.rotation.y = Math.sin(Date.now() * 0.001) * -0.1;
 
@@ -383,14 +391,22 @@ class Generator {
                 flower.meshGroupScale += (flower.meshGroupScaleTarget - flower.meshGroupScale) * 0.3;
                 flower.meshGroup.scale.set(flower.meshGroupScale, flower.meshGroupScale, flower.meshGroupScale);
             }
-            
+
+            // update orbit controls            
 
             // render the scene and queue up another frame
             this.renderer.render(this.scene, this.camera);
-            stats.end();
+            // stats.end();
+            console.log("SAS")
+        }
+        
+        loop2(){
+            console.log("SAS")            
+            this.renderer.render(this.scene, this.camera);
         }
 
-        // In webXR, we need to use renderer.setAnimationLoop() instead of requestAnimationFrame()        
+        // In webXR, we need to use renderer.setAnimationLoop() instead of requestAnimationFrame()
+        // window.requestAnimationFrame(() => this.loop());
     
 }
 
