@@ -31,7 +31,7 @@ Flower Generation (Technical):
 */
 
 
-import { ARButton } from '../XR//ARButton.js';
+import { ARButton } from '../libs/ARButton.js';
 var params = {
     flowerCount: 15,
     lines: 3,
@@ -47,9 +47,9 @@ var params = {
     speed: 1,
     invert: false
 };
-var stats = new Stats();
-stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-document.body.appendChild(stats.dom);
+//var stats = new Stats();
+//stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+//document.body.appendChild(stats.dom);
 let progMax = -210;
 let now = 0;
 let then = 0;
@@ -250,8 +250,11 @@ class Generator {
     }
 
     setupXR() {
-        this.renderer.xr.enabled = true;
-        document.body.appendChild(ARButton.createButton(this.renderer));
+        let sphere = new THREE.SphereGeometry(4.5, 32, 32);
+        let material = new THREE.MeshBasicMaterial({color: 0xff0000});
+        let sphMesh = new THREE.Mesh(sphere, material);
+        this.scene.add(sphMesh);        
+        
     }
 
 
@@ -265,7 +268,7 @@ class Generator {
     setupCamera() {
         this.fov = 75;
         this.camera = new THREE.PerspectiveCamera(this.fov, 0, 0.01, 1000);
-        this.camera.position.z = 10;
+        //this.camera.position.z = 10;
     }
 
     setupScene() {
@@ -273,11 +276,12 @@ class Generator {
     }
 
     setupRenderer() {
-        this.renderer = new THREE.WebGLRenderer({
-            antialias: true
-        });
+        this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+        this.renderer.outputEncoding = THREE.sRGBEncoding;
+		this.renderer.xr.enabled = true;
 
         document.body.appendChild(this.renderer.domElement);
+        document.body.appendChild( ARButton.createButton( this.renderer ) );
     }
 
     setupOrbit() {
@@ -353,7 +357,7 @@ class Generator {
         if (elapsed > fpsInterval) {        //Limits to 60fps
             then = now - (elapsed % fpsInterval);
 
-            stats.begin();
+            // stats.begin();
             for (let iter = 0; iter < this.flowers.length; iter++) {
 
                 const flower = this.flowers[iter];
@@ -392,7 +396,7 @@ class Generator {
 
             // render the scene and queue up another frame
             this.renderer.render(this.scene, this.camera);
-            stats.end();
+            // stats.end();
         }
         window.requestAnimationFrame(() => this.loop());
     }
