@@ -1,10 +1,9 @@
-import { ARButton } from '../XR//ARButton.js';
 var params = {
     flowerCount: 15,
     lines: 3,
     stems: 5,
     angleRange: 0.01,
-    depth: 9.0,
+    depth: 5.0,
     noiseSpeed: 0.0003,
     iterations: 3000,
     hue: 300,
@@ -17,9 +16,6 @@ var stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild(stats.dom);
 let progMax = -210;
-let now = 0;
-let then = 0;
-const fpsInterval = 1000 / 60;
 
 class Walker {
     constructor(config) {
@@ -123,11 +119,8 @@ class Flower {
                 time: i * 1000
             });
 
-
-            let points = [];
-            //let geometry = new THREE.Geometry();
-            // let geometry = new THREE.BufferGeometry();                        
-            let geom = new THREE.BufferGeometry();
+            let geometry = new THREE.Geometry();
+            let line = new MeshLine();
 
             // grab each path point and push it to the geometry
             for (let j = 0, len = walker.path.length; j < len; j++) {
@@ -136,48 +129,37 @@ class Flower {
                 let y = p.y;
                 let z = p.z;
                 this.edge = Math.max(this.edge, Math.abs(x), Math.abs(y));
-                points.push(new THREE.Vector3(x, y, z));
+                geometry.vertices.push(new THREE.Vector3(x, y, z));
             }
-            geom.setFromPoints(points);
+
             // set the thickness of the line and assign the geometry
-            // line.setPoints(points, p => {
-            //     let size = 1;
-            //     let n = size - Math.abs(Calc.map(p, 0, 1, -size, size)) + 0.1;
-            //     return n;
-            // });  
+            line.setGeometry(geometry, p => {
+                let size = 1;
+                let n = size - Math.abs(Calc.map(p, 0, 1, -size, size)) + 0.1;
+                return n;
+            });
 
             // create new material based on the controls
             const plusOrMinus = Math.random() < 0.5 ? -1 : 1;
             const colorVariance = Math.floor(Math.random() * params.hueVariance) * plusOrMinus;
             const hue = (params.hue + colorVariance) % 360;
-            // let material = new MeshLineMaterial({
-            //     blending: params.invert ? THREE.NormalBlending : THREE.AdditiveBlending,
-            //     color: new THREE.Color(`hsl(${360 + hue + Calc.map(i, 0, this.count, -params.hueRange, params.hueRange)}, 100%, ${params.lightness}%)`),
-            //     depthTest: false,
-            //     opacity: 1,
-            //     transparent: true,
-            //     lineWidth: 0.04,
-            //     resolution: this.resolution
-            // });
-
-            let lineMat = new THREE.LineBasicMaterial({
-                color: new THREE.Color(`hsl(${360 + hue + Calc.map(i, 0, this.count, -params.hueRange, params.hueRange)}, 100%, ${params.lightness}%)`),
+            let material = new MeshLineMaterial({
                 blending: params.invert ? THREE.NormalBlending : THREE.AdditiveBlending,
-                transparent: true,
+                color: new THREE.Color(`hsl(${360 + hue + Calc.map(i, 0, this.count, -params.hueRange, params.hueRange)}, 100%, ${params.lightness}%)`),
                 depthTest: false,
                 opacity: 1,
-                linewidth: 0.04,
-                linecap: 'round', //ignored by WebGLRenderer
-                linejoin: 'round' //ignored by WebGLRenderer
+                transparent: true,
+                lineWidth: 0.04,
+                resolution: this.resolution
             });
 
 
             // create meshes for all of the stems/reflections
             for (let k = 0; k < this.stems; k++) {
-                let line = new THREE.Line(geom, lineMat);
-                line.rotation.z = Calc.map(k, 0, this.stems, 0, Math.PI * 2);
-                this.meshes.push(line);
-                this.meshGroup.add(line);
+                let mesh = new THREE.Mesh(line.geometry, material);
+                mesh.rotation.z = Calc.map(k, 0, this.stems, 0, Math.PI * 2);
+                this.meshes.push(mesh);
+                this.meshGroup.add(mesh);
             }
         }
         this.meshGroup.position.x = this.baseX;
@@ -219,16 +201,8 @@ class Generator {
         this.onResize();
         this.init();
         this.reset();
-        then = Date.now();
         this.loop();
-        this.setupXR();
     }
-
-    setupXR() {
-        this.renderer.xr.enabled = true;
-        document.body.appendChild(ARButton.createButton(this.renderer));
-    }
-
 
     init() {
         this.flowers = [];
@@ -323,58 +297,50 @@ class Generator {
     }
 
     loop() {
-        now = Date.now();
-        let elapsed = now - then;        
-        if (elapsed > fpsInterval) {        //Limits to 60fps
-            then = now - (elapsed % fpsInterval);
+        stats.begin();
+        for (let iter = 0; iter < this.flowers.length; iter++) {
 
-            stats.begin();
-            for (let iter = 0; iter < this.flowers.length; iter++) {
+            const flower = this.flowers[iter];
+            // if (flower.progress > progMax) {
+            //     progMax = flower.progress;
+            //     console.log(progMax)
+            // }
+            //Subtle rotation of flowers
+            flower.meshGroup.rotation.x = Math.cos(Date.now() * 0.001) * 0.1;
+            flower.meshGroup.rotation.y = Math.sin(Date.now() * 0.001) * -0.1;
 
-                const flower = this.flowers[iter];
-                // if (flower.progress > progMax) {
-                //     progMax = flower.progress;
-                //     console.log(progMax)
-                // }
-                //Subtle rotation of flowers
-                flower.meshGroup.rotation.x = Math.cos(Date.now() * 0.001) * 0.1;
-                flower.meshGroup.rotation.y = Math.sin(Date.now() * 0.001) * -0.1;
+            // handle all the funky progress math        
+            flower.progress += flower.progressSpeed;
+            if (flower.progress > 1) {
+                flower.progressed = true;
+            }
+            flower.progressModulo = flower.progress % 2;
+            flower.progressEffective = flower.progressModulo < flower.duration ? flower.progressModulo : 1 - (flower.progressModulo - 1);
+            flower.progressEased = flower.progressed ? Ease.inOutExpo(flower.progressEffective, 0, flower.easeSpeed, flower.duration) : Ease.outExpo(flower.progressEffective, 0, flower.easeSpeed, flower.duration);
 
-                // handle all the funky progress math        
-                flower.progress += flower.progressSpeed;
-                if (flower.progress > 1) {
-                    flower.progressed = true;
-                }
-                flower.progressModulo = flower.progress % 2;
-                flower.progressEffective = flower.progressModulo < flower.duration ? flower.progressModulo : 1 - (flower.progressModulo - 1);
-                flower.progressEased = flower.progressed ? Ease.inOutExpo(flower.progressEffective, 0, flower.easeSpeed, flower.duration) : Ease.outExpo(flower.progressEffective, 0, flower.easeSpeed, flower.duration);
-
-                // loop over all meshes and update their opacity and visibility
-                let i = flower.meshes.length;
-                while (i--) {
-                    let mesh = flower.meshes[i];
-                    mesh.material.opacity = Calc.clamp(flower.progressEffective * 2, 0, 1);
-                    mesh.material.opacity = Calc.map(flower.progressEased, 0, 1, 0, 1);
-                    //mesh.visible = flower.progressEased;
-                    //console.log(flower.progressEased)
-                }
-
-                // ease the scale of the mesh
-                flower.meshGroupScale += (flower.meshGroupScaleTarget - flower.meshGroupScale) * 0.3;
-                flower.meshGroup.scale.set(flower.meshGroupScale, flower.meshGroupScale, flower.meshGroupScale);
+            // loop over all meshes and update their opacity and visibility
+            let i = flower.meshes.length;
+            while (i--) {
+                let mesh = flower.meshes[i];
+                mesh.material.uniforms.opacity.value = Calc.clamp(flower.progressEffective * 2, 0, 1);
+                mesh.material.uniforms.visibility.value = flower.progressEased;
+                
             }
 
-            // update orbit controls
-            this.orbit.update();
-
-            // render the scene and queue up another frame
-            this.renderer.render(this.scene, this.camera);
-            stats.end();
+            // ease the scale of the mesh
+            flower.meshGroupScale += (flower.meshGroupScaleTarget - flower.meshGroupScale) * 0.3;
+            flower.meshGroup.scale.set(flower.meshGroupScale, flower.meshGroupScale, flower.meshGroupScale);
         }
+
+        // update orbit controls
+        this.orbit.update();
+
+        // render the scene and queue up another frame
+        this.renderer.render(this.scene, this.camera);
+        stats.end();
         window.requestAnimationFrame(() => this.loop());
     }
 }
 
 
-export { Generator }
-export { params }
+var generatorA = new Generator();

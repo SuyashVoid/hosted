@@ -1,6 +1,3 @@
-import {Generator,params} from './flower.js';
-
-var generatorA = new Generator();
 var GUI = lil.GUI;
 const gui = new GUI();
 window.addEventListener('load', e => {
@@ -17,7 +14,6 @@ window.addEventListener('load', e => {
     flowerFolder.add(params, 'hueRange', 0, 90, 1).onFinishChange(reset);
     //flowerFolder.add(params, 'lightness', 0, 100, 1).onFinishChange(reset);
     flowerFolder.add(params, 'invert').onFinishChange(reset);;
-    flowerFolder.close();
 })
 
 function reset() {
