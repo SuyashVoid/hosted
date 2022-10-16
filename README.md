@@ -1,7 +1,7 @@
-# JS Visualizations
+# Visualizations
 
 - Lavender Visualization: https://cyclonefire.github.io/hosted/NoiseFields/index.html  
-   - Going live for Lavender creek farms (https://www.lavendercreekfarm.com/) next summer  
+   - Going live for Lavender creek farms (https://www.lavendercreekfarm.com/) summer 2023  
    - Will use realtime data (like wind speed, CO2, humidity etc.) sent from the farms to manipulate the visualization
     
 - Augmented Reality animated flowers demo : https://cyclonefire.github.io/hosted/XR/flower.html  
