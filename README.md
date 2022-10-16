@@ -14,3 +14,4 @@
    - Originally designed to work alongside the pairing handheld device (with gyro and accelerometer) that sent their position to the site using MQTT.  
    - Each device had its own colored trail that would interact or light up if moved in a certain pattern within the canvas.  
    
+- Rest of the works (Python, Unity, C#) are private as required by my contracts.
