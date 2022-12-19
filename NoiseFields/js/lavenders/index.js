@@ -168,8 +168,7 @@ function resize() {
 
 function resetSystem() {
     const firstTime = particles.length == 0
-    particles = [];
-    Wrule = GetAxiomTree();
+    particles = [];    
     scene.remove.apply(scene, scene.children);
     frameCount = 0;
 

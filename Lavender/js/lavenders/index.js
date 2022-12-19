@@ -1,6 +1,8 @@
 import { EffectComposer } from '../libs/EffectComposer.js';
 import { RenderPass } from '../libs/RenderPass.js';
 import { AfterimagePass } from '../libs/AfterimagePass.js';
+import { BokehPass } from '../libs/BokehPass.js';
+
 // Coolor constants (can be integrated)
 var gui;
 // Scene global variables
@@ -18,6 +20,7 @@ let particleSystem;
 // Materials
 let composer;
 let afterimagePass;
+let bokehPass;
 // Stats
 let stats = new Stats();
 // Particles, Noise and plant displayed
@@ -42,17 +45,18 @@ function setupGUI() {
     var f3A = f3.addFolder('Particles');
     var f4 = gui.addFolder('Field Particles')
     var f5 = gui.addFolder('Field')
+    // var f6 = gui.addFolder('DoF')
     gui.add(params, 'shouldResetCam')
 
 
-    f1.add(params, 'noiseScale', 0, 0.2);
+    f1.add(params, 'noiseScale', 0.06, 0.2);
     //f1.add(params, 'noiseSpeed', 0, 0.025);
-    f1.add(params, 'noiseStrength', 0, 3);
+    f1.add(params, 'noiseStrength', 0.9, 1.9);
     //f2.add(params, 'lifeLimit', 30, 400);
     f2.add(params, 'tempTrailLen', 0.8, 1);
-    f2A.add(params, 'strayParticleSpeed', 0, 0.2);
-    f2A.add(params, 'strayNoiseScale', 0, 0.25);
-    f2A.add(params, 'strayNoiseSpeed', 0, 3);
+    f2A.add(params, 'strayParticleSpeed', 0.01, 0.16);
+    f2A.add(params, 'strayNoiseScale', 0.015, 0.21);
+    f2A.add(params, 'strayNoiseSpeed', 0.23, 2.72);
     f3A.addColor(params, 'particleColor').onChange(updateColors);
     f3A.addColor(params, 'particleColor2').onChange(updateColors);
     f3A.addColor(params, 'particleColor3').onChange(updateColors);
@@ -60,24 +64,31 @@ function setupGUI() {
     var f3B = f3.addFolder('Background');
     f3B.addColor(params, 'bgGradient1');
     f3B.addColor(params, 'bgGradient2');
+    // Go from #A08F2 - #473B68
+
     f3B.add(params, 'bgAngle', 0, 360, 1)
 
     f4.add(fieldParams, 'xFactor', 0, 15)
     f4.add(fieldParams, 'yFactor', 0, 5)
     f4.add(fieldParams, 'yRandomness', 0, fieldParams.yFactor).onFinishChange(resetSystem)
-    f4.add(fieldParams, 'lifeDivider', 100, 1000)
+    f4.add(fieldParams, 'lifeDivider', 900, 450)
     f4.add(fieldParams, 'lifeVariancy', 0.1, 0.9).onFinishChange(resetSystem)
     f4.add(fieldParams, 'strayParticles', 0, 0.5).onFinishChange(resetSystem)
     f4.add(fieldParams, 'maxFunctionTravel', 0, Math.PI)
     f4.add(fieldParams, 'sizeRandomness', 0.1, 0.9).onFinishChange(updateSizes)
 
-    f5.add(params, 'particleMultiplier', 0.1, 3.5).onFinishChange(resetSystem);
-    f5.add(params, 'sizeMultiplier', 0, 3).onChange(updateSizes);
+    f5.add(params, 'particleMultiplier', 1.5, 3).onFinishChange(resetSystem);
+    f5.add(params, 'sizeMultiplier', 1.2, 1.6).onChange(updateSizes);
     f5.add(fieldParams, 'fieldCount', 1, 5, 1).onFinishChange(resetSystem);
     f5.add(fieldParams, 'progressiveDecline').onFinishChange(resetSystem);
     f5.add(fieldParams, 'depth', 50, 500, 1).onFinishChange(resetSystem);
     f5.add(fieldParams, 'distance', 10, 70).onFinishChange(resetSystem);
     f5.add(fieldParams, 'perspectiveDelta', 0, 0.3).onFinishChange(resetSystem)
+
+    // f6.add(params, 'focus', 1980, 2080)
+    // f6.add(params, 'aperture', 0, .001, 0.0001)
+    // f6.add(params, 'maxblur', 0, 0.05, 0.001)
+
 
     //f1.close()
     f2.close()
@@ -104,11 +115,14 @@ function setupRenderer() {
     document.body.appendChild(renderer.domElement);
 
     composer = new EffectComposer(renderer);
-    composer.addPass(new RenderPass(scene, camera));
-
+    
     afterimagePass = new AfterimagePass();
     afterimagePass.uniforms['damp'].value = params.trailLen;
+    // bokehPass = new BokehPass(scene, camera, {"focus": params.focus, "aperture": params.aperture, "maxblur": params.maxblur, "aspect":camera.aspect});
+
+    composer.addPass(new RenderPass(scene, camera));
     composer.addPass(afterimagePass);
+    // composer.addPass(bokehPass);
 
     uniforms = {
 
@@ -168,8 +182,7 @@ function resize() {
 
 function resetSystem() {
     const firstTime = particles.length == 0
-    particles = [];
-    Wrule = GetAxiomTree();
+    particles = [];    
     scene.remove.apply(scene, scene.children);
     frameCount = 0;
 
@@ -178,15 +191,6 @@ function resetSystem() {
     positions = [];
     colors = [];
     sizes = [];
-    // particlesInit(12, 0, 0, 200, 0.08, true, 1, 1.2, false)
-    // particlesInit(10, 0, 0, 200, 0.08, false, 1, 1.1, true)
-    // particlesInit(-10, 0, 0, 200, 0.08, true, 1, 1, true)
-    // particlesInit(-12, 0, 0, 200, 0.08, false, 1, 1, false)
-
-    // particlesInit(-40, 0, 0, 180, 0.14, false, 0.4, 0.7, false)
-    // particlesInit(-42, 0, 0, 180, 0.14, true, 0.4, 0.7, false)
-    // particlesInit(42, 0, 0, 180, 0.14, true, 0.4, 0.7, false)
-    // particlesInit(40, 0, 0, 180, 0.14, false, 0.4, 0.7, false)
 
     fieldSetter(fieldParams.fieldCount, fieldParams.distance, params.progressiveDecline)
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
@@ -289,6 +293,10 @@ function render() {
     }
     updateBG()
     afterimagePass.uniforms['damp'].value = params.trailLen;
+    // bokehPass.uniforms['focus'].value = params.focus;
+    // bokehPass.uniforms['aperture'].value = params.aperture;
+    // bokehPass.uniforms['maxblur'].value = params.maxblur;
+
     composer.render();
     stats.end();
     requestAnimationFrame(render);
