@@ -49,41 +49,41 @@ function setupGUI() {
     gui.add(params, 'shouldResetCam')
 
 
-    f1.add(params, 'noiseScale', 0.06, 0.2);
+    f1.add(params, 'noiseScale', 0.06, 0.2).listen();
     //f1.add(params, 'noiseSpeed', 0, 0.025);
-    f1.add(params, 'noiseStrength', 0.9, 1.9);
+    f1.add(params, 'noiseStrength', 0.9, 1.9).listen();
     //f2.add(params, 'lifeLimit', 30, 400);
     f2.add(params, 'tempTrailLen', 0.8, 1);
-    f2A.add(params, 'strayParticleSpeed', 0.01, 0.16);
-    f2A.add(params, 'strayNoiseScale', 0.015, 0.21);
-    f2A.add(params, 'strayNoiseSpeed', 0.23, 2.72);
-    f3A.addColor(params, 'particleColor').onChange(updateColors);
+    f2A.add(params, 'strayParticleSpeed', 0.01, 0.16).listen();
+    f2A.add(params, 'strayNoiseScale', 0.015, 0.21).listen();
+    f2A.add(params, 'strayNoiseSpeed', 0.23, 2.72).listen();
+    f3A.addColor(params, 'particleColor').onChange(updateColors).listen();
     f3A.addColor(params, 'particleColor2').onChange(updateColors);
     f3A.addColor(params, 'particleColor3').onChange(updateColors);
 
     var f3B = f3.addFolder('Background');
     f3B.addColor(params, 'bgGradient1');
-    f3B.addColor(params, 'bgGradient2');
+    f3B.addColor(params, 'bgGradient2').listen();
     // Go from #A08F2 - #473B68
 
     f3B.add(params, 'bgAngle', 0, 360, 1)
 
-    f4.add(fieldParams, 'xFactor', 0, 15)
-    f4.add(fieldParams, 'yFactor', 0, 5)
-    f4.add(fieldParams, 'yRandomness', 0, fieldParams.yFactor).onFinishChange(resetSystem)
-    f4.add(fieldParams, 'lifeDivider', 900, 450)
-    f4.add(fieldParams, 'lifeVariancy', 0.1, 0.9).onFinishChange(resetSystem)
-    f4.add(fieldParams, 'strayParticles', 0, 0.5).onFinishChange(resetSystem)
-    f4.add(fieldParams, 'maxFunctionTravel', 0, Math.PI)
-    f4.add(fieldParams, 'sizeRandomness', 0.1, 0.9).onFinishChange(updateSizes)
+    f4.add(params, 'xFactor', 0, 15)
+    f4.add(params, 'yFactor', 0, 5)
+    f4.add(params, 'yRandomness', 0, params.yFactor).onFinishChange(resetSystem)
+    f4.add(params, 'lifeDivider', 450, 900).listen()
+    f4.add(params, 'lifeVariancy', 0.1, 0.9).onFinishChange(resetSystem)
+    f4.add(params, 'strayParticles', 0, 0.5).onFinishChange(resetSystem).listen()
+    f4.add(params, 'maxFunctionTravel', 0, Math.PI)
+    f4.add(params, 'sizeRandomness', 0.1, 0.9).onFinishChange(updateSizes)
 
-    f5.add(params, 'particleMultiplier', 1.5, 3).onFinishChange(resetSystem);
+    f5.add(params, 'particleMultiplier', 1.5, 3).onFinishChange(resetSystem).listen();
     f5.add(params, 'sizeMultiplier', 1.2, 1.6).onChange(updateSizes);
-    f5.add(fieldParams, 'fieldCount', 1, 5, 1).onFinishChange(resetSystem);
-    f5.add(fieldParams, 'progressiveDecline').onFinishChange(resetSystem);
-    f5.add(fieldParams, 'depth', 50, 500, 1).onFinishChange(resetSystem);
-    f5.add(fieldParams, 'distance', 10, 70).onFinishChange(resetSystem);
-    f5.add(fieldParams, 'perspectiveDelta', 0, 0.3).onFinishChange(resetSystem)
+    f5.add(params, 'fieldCount', 1, 5, 1).onFinishChange(resetSystem);
+    f5.add(params, 'progressiveDecline').onFinishChange(resetSystem);
+    f5.add(params, 'depth', 50, 500, 1).onFinishChange(resetSystem);
+    f5.add(params, 'distance', 10, 70).onFinishChange(resetSystem);
+    f5.add(params, 'perspectiveDelta', 0, 0.3).onFinishChange(resetSystem)
 
     // f6.add(params, 'focus', 1980, 2080)
     // f6.add(params, 'aperture', 0, .001, 0.0001)
@@ -192,7 +192,7 @@ function resetSystem() {
     colors = [];
     sizes = [];
 
-    fieldSetter(fieldParams.fieldCount, fieldParams.distance, params.progressiveDecline)
+    fieldSetter(params.fieldCount, params.distance, params.progressiveDecline)
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
     geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
     geometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1).setUsage(THREE.DynamicDrawUsage));
@@ -207,7 +207,7 @@ function resetSystem() {
 }
 
 function fieldSetter(fieldCount, distance, progressiveDecline) {
-    const baseDepth = fieldParams.depth
+    const baseDepth = params.depth
     const basePack = 0.08
     for (let i = 1; i <= fieldCount; i++) {
         let dist = (i - 1) * (distance - (fieldWidth * 3 * i / 4));
@@ -258,7 +258,7 @@ function giveMeField(x, y, z, len, packDist, isRight, unite) {
     for (let i = 0; i < particleCount; i++) {
         let xOffset = 0
         if (i > particleCount * 0.01 && unite) {
-            xOffset = i * boolToDirection(x <= 0) * fieldParams.perspectiveDelta / 40 + (-x / 20);
+            xOffset = i * boolToDirection(x <= 0) * params.perspectiveDelta / 40 + (-x / 20);
         }
         const xRandom = Math.random() * (fieldWidth + xOffset) - ((fieldWidth + xOffset) / 2)
         let zOffset = -1 * Math.pow(i, 0.91) * packDist;
@@ -347,7 +347,7 @@ function updateSizes() {
     const siz = geometry.attributes.size.array;
     for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
-        p.size = Math.random() * fieldParams.sizeRandomness + (1 - fieldParams.sizeRandomness)
+        p.size = Math.random() * params.sizeRandomness + (1 - params.sizeRandomness)
         siz[i] = particles[i].size * params.sizeMultiplier
     }
     geometry.attributes.size.needsUpdate = true;
@@ -451,3 +451,4 @@ setupScene();
 let theModule = { camera }
 window.myModule = theModule;
 render();
+export { resetSystem, updateColors,updateSizes}

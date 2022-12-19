@@ -47,12 +47,7 @@ var params = {
     aperture: 0.0001,
     maxblur: 0.01,
     Preset: 0,
-    renderIterations() {
-        particlesInit();
-    }
-};
 
-var fieldParams = {
     xFactor: 12.78,
     yFactor: 2.785,
     yRandomness: 1.4067,
@@ -65,9 +60,12 @@ var fieldParams = {
     fieldCount: 3,
     distance: 45,
     progressiveDecline: true,
-    depth: 200
+    depth: 200,
+    renderIterations() {
+        particlesInit();
+    }
+};
 
-}
 
 
 class Particle {
@@ -78,19 +76,19 @@ class Particle {
         this.baseLife = Math.floor((Math.random() * params.lifeLimit * 0.3) - params.lifeLimit * 0.15);
         this.scaleFactor = Math.random() * 0.2 + 1;
         this.life = Math.random() * params.lifeLimit * 0.45;
-        this.ySpeed = Math.random() * fieldParams.yRandomness + (fieldParams.yFactor - fieldParams.yRandomness);
-        this.size = Math.random() * fieldParams.sizeRandomness + (1 - fieldParams.sizeRandomness);
+        this.ySpeed = Math.random() * params.yRandomness + (params.yFactor - params.yRandomness);
+        this.size = Math.random() * params.sizeRandomness + (1 - params.sizeRandomness);
         this.ex = x;
         this.ey = y;
         this.ez = z;
-        this.shouldRun = Math.random() < fieldParams.strayParticles;
+        this.shouldRun = Math.random() < params.strayParticles;
         this.pos = new THREE.Vector3(x, y, z);
         this.vel = new THREE.Vector3(0, 0, 0);
         this.acc = new THREE.Vector3(0, 0, 0);
         this.angle = new THREE.Euler(0, 0, 0);
         this.noise = 0;
         //this.shouldChangeHue = Math.random() < 0.66;
-        this.lifeLimitRandomNess = Math.random() * (params.lifeLimit * fieldParams.lifeVariancy)
+        this.lifeLimitRandomNess = Math.random() * (params.lifeLimit * params.lifeVariancy)
             //this.randomBoundaryOffset = -params.size / 1.2;
         this.isRight = isRight
         this.colorIndex = Math.floor(Math.random() * 3);
@@ -114,10 +112,10 @@ class Particle {
     }
     update() {
 
-        this.life += (params.lifeLimit / this.scaleFactor) / fieldParams.lifeDivider;
+        this.life += (params.lifeLimit / this.scaleFactor) / params.lifeDivider;
         const posVect = new THREE.Vector3
         if (this.shouldRun) {
-            this.life += (params.lifeLimit / this.scaleFactor) / (fieldParams.lifeDivider * 8);
+            this.life += (params.lifeLimit / this.scaleFactor) / (params.lifeDivider * 8);
             if (this.isRight)
                 this.acc.set(0.8, this.ySpeed, 0);
             else
@@ -132,15 +130,15 @@ class Particle {
             posVect.copy(this.pos)
         } else {
             //let x = (this.life / params.lifeLimit) / 50
-            let x = numScale(this.life, 0, params.lifeLimit, 0, fieldParams.maxFunctionTravel)
+            let x = numScale(this.life, 0, params.lifeLimit, 0, params.maxFunctionTravel)
             let y = curveFunction(x)
 
             if (this.isRight)
-                this.pos.x = this.ex + x * fieldParams.xFactor * this.scaleFactor * this.xMultiplier;
+                this.pos.x = this.ex + x * params.xFactor * this.scaleFactor * this.xMultiplier;
             else
-                this.pos.x = this.ex + x * -fieldParams.xFactor * this.scaleFactor * this.xMultiplier;
+                this.pos.x = this.ex + x * -params.xFactor * this.scaleFactor * this.xMultiplier;
 
-            this.pos.y = this.ey + y * this.ySpeed * this.scaleFactor * fieldParams.yFactor * this.yMultiplier;
+            this.pos.y = this.ey + y * this.ySpeed * this.scaleFactor * params.yFactor * this.yMultiplier;
             this.pos.z = this.ez
 
             this.noise = numScale(this.noise, -1, 1, 0, params.noiseStrength)
