@@ -1,0 +1,25 @@
+html,
+body {
+    height: 100%;
+}
+
+body {
+    background: rgb(50, 0, 91);
+    background: linear-gradient(to bottom, #36d1dc, #5b86e5);
+    overflow: hidden;
+}
+
+canvas {
+    bottom: 0;
+    cursor: move;
+    cursor: grab;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+}
+
+canvas:active {
+    cursor: move;
+    cursor: grabbing;
+}
