@@ -31,7 +31,8 @@ const topicLimits = {
         max: 100
     }
 }
-
+// Rain 
+// Invert lifeDivider
 const paramLimits = {
     "wind":{
         "strayParticleSpeed": {min: 0.01, max: 0.16},
@@ -43,14 +44,17 @@ const paramLimits = {
         
         "particleMultiplier": {min: 1.5, max: 3}
     },
+    // Increase size range
     "CO2":{
         "sizeMultiplier": {min: 1.2, max: 1.6},
         "noiseScale": {min: 0.006, max: 0.2},
         "noiseStrength": {min: 0.9, max: 1.9},
     },
+    // Invert lights 
     "light":{
         "bgGradient2": {min: "0xA082F2", max: "0x473B68"}
     },
+    // Stray particles not going down to 0.04
     "humidity":{
         "strayParticles": {min: 0.04, max: 0.61},
         "particleColor": {min: "0x4805E6", max: "0x0514E6"}
@@ -84,6 +88,7 @@ client.on('message', function(topic, message) {
     }
     
 });
+
 
 // This function handles special cases of parameters that need to be updated in a different way
 function liveUpdate(value, parameter, topicLimit, paramLimit){
