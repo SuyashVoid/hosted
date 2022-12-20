@@ -1,29 +1,29 @@
 import { resetSystem, updateColors, updateSizes} from "./index.js";
 
-const host = "foresta-projects.cloud.shiftr.io"
+const host = "lavendertest.cloud.shiftr.io"
 var options = {
     clientId: 'LavenderUser'+Math.random()*1000,
-    username: 'foresta-projects',
-    password: 'ADOh7ArkqjIE27zR'
+    username: 'lavendertest',
+    password: 'supposedPassword'
 }
-const topics = ["Lavender/wind", "Lavender/temp", "Lavender/CO2", "Lavender/light", "Lavender/humidity"]
+const topics = ["Lavender/wind", "Lavender/temp", "Lavender/co2", "Lavender/light", "Lavender/humidity"]
 
 const topicLimits = {
     "wind": {
-        min: 200,
-        max: 700
+        min: 0,
+        max: 100
     },
     "temp": {
         min: 0,
-        max: 40,        
+        max: 100,        
     },
-    "CO2": {
-        min: 350,
-        max: 1000
+    "co2": {
+        min: 0,
+        max: 100
     },
     "light": {
         min: 0,
-        max: 4096
+        max: 100
     },
     "humidity": {
         min: 0,
@@ -42,7 +42,7 @@ const paramLimits = {
         
         "particleMultiplier": {min: 1.5, max: 3}
     },
-    "CO2":{
+    "co2":{
         "sizeMultiplier": {min: 1.2, max: 1.6},
         "noiseScale": {min: 0.006, max: 0.2},
         "noiseStrength": {min: 0.9, max: 1.9},
