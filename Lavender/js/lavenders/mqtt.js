@@ -1,10 +1,11 @@
 import { resetSystem, updateColors, updateSizes} from "./index.js";
+//poetryai:605k8jiP5ZQXyMEJ@poetryai.cloud.shiftr.io
 
-const host = "foresta-projects.cloud.shiftr.io"
+const host = "poetryai.cloud.shiftr.io"
 var options = {
     clientId: 'LavenderUser'+Math.random()*1000,
-    username: 'foresta-projects',
-    password: 'ADOh7ArkqjIE27zR'
+    username: 'poetryai',
+    password: '605k8jiP5ZQXyMEJ'
 }
 const topics = ["Lavender/wind", "Lavender/temp", "Lavender/CO2", "Lavender/light", "Lavender/humidity"]
 
