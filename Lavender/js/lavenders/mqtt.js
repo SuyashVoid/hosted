@@ -62,6 +62,7 @@ const paramLimits = {
 const resetThreshold = 0.1; 
 const humidityThreshold = 88;
 let currentHumidity = 30;
+let currentRain = 4096;
 console.log('connecting to ' + host + ' ...');
 const client = mqtt.connect('wss://'+host, options);
 
@@ -78,17 +79,20 @@ client.on('message', function(topic, message) {
     for(let i = 0; i < topics.length; i++){
         if(topic == topics[i]){            
             const value = parseInt(message);   
+            if(topic == "Lavender/rain"){
+                currentRain = value;
+            }
             if(topic == "Lavender/humidity"){
                 if(value > humidityThreshold && currentHumidity < humidityThreshold){                    
                     params.particleColor2 = 0x0087fc;
                     currentHumidity = value;
                     updateColors();
-                }else if(value < humidityThreshold && currentHumidity > humidityThreshold){
+                }else if(value < humidityThreshold && currentHumidity > humidityThreshold && currentRain > 4095){
                     params.particleColor2 = 0x49c115;
                     currentHumidity = value;
                     updateColors();
                 }
-            }               
+            }
             const param = topics[i].split("/")[1];
             const topicLimit = topicLimits[param];
             for(const parameter in paramLimits[param]){
