@@ -1,5 +1,4 @@
 import { resetSystem, updateColors, updateSizes} from "./index.js";
-//poetryai:605k8jiP5ZQXyMEJ@poetryai.cloud.shiftr.io
 
 const host = "poetryai.cloud.shiftr.io"
 var options = {
@@ -17,8 +16,7 @@ const topicLimits = {
     "temp": {
         min: 0,
         max: 40,        
-    },
-    // 800 : should give 2.5 value
+    },    
     "co2": {
         min: 350,
         max: 1000
@@ -51,20 +49,17 @@ const paramLimits = {
         "sizeMultiplier": {min: 1.2, max: 2.9},
         "noiseScale": {min: 0.006, max: 0.2},
         "noiseStrength": {min: 0.9, max: 1.9},
-    },
-    // Invert lights 
+    },    
     "light":{
         "bgGradient2": {min: "0x473B68", max: "0xA082F2"}
     },
     "rain":{
-        "strayParticles": {min: 0.04, max: 0.1},
-        // Particle color 2 :  - 0087fc
-        // 0087fc - 0x4805E6
-        "particleColor": {min: "0x4805E6", max: "0x0514E6"}
+        "strayParticles": {min: 0.04, max: 0.1},        
+        "particleColor2": {min: "0x0087fc", max: "0x49c115"}
     }
 }
  
-const resetThreshold = 0.1; // Only reset system (for particle count/ stray particle count) if chnage is greater than this threshold (% of max change 0 being 0%, 1 being 100%)
+const resetThreshold = 0.1; 
 const humidityThreshold = 88;
 let currentHumidity = 30;
 console.log('connecting to ' + host + ' ...');
@@ -111,38 +106,36 @@ client.on('message', function(topic, message) {
 function liveUpdate(value, parameter, topicLimit, paramLimit){
     let scaledValue
 
-    if(parameter == "bgGradient2" || parameter == "particleColor"){
+    if(parameter == "bgGradient2" || parameter == "particleColor2"){
         const ratio = scaleVal(value, topicLimit.min, topicLimit.max, 0, 1);
         if(parameter == "bgGradient2")
         scaledValue = lerpColor(paramLimit.min, paramLimit.max, ratio,"css");
-        else
-        scaledValue = lerpColor(paramLimit.min, paramLimit.max, ratio,"hex");
+        else{            
+            scaledValue = lerpColor(paramLimit.min, paramLimit.max, ratio,"hex");
+        }
         params[parameter] = scaledValue;
         updateColors();
     }else{
         scaledValue = scaleVal(value, topicLimit.min, topicLimit.max, paramLimit.min, paramLimit.max);
         if(parameter == "strayParticles" || parameter=="particleMultiplier"){
             if(isInThreshold(params[parameter], scaledValue, paramLimit.max, paramLimit.min)){
-                if(scaleVal(value, topicLimit.min, topicLimit.max, 0, 1) < 0.13){
-                    if(parameter == "strayParticles"){                        
-                            params[parameter] = paramLimit.min;
-                            resetSystem();                        
-                    }else {
+                if(scaleVal(value, topicLimit.min, topicLimit.max, 0, 1) < (resetThreshold*1.3)){
+                    if(parameter == "strayParticles")
+                        params[parameter] = paramLimit.max;
+                    else
                         params[parameter] = paramLimit.min;
-                        resetSystem();
-                    }
-                    
+
+                    resetSystem();
                 }else{
-                    if(parameter == "strayParticles"){                        
-                            params[parameter] = paramLimit.min;
-                            resetSystem();                        
-                    }else{
+                    if(parameter == "strayParticles")                    
+                        params[parameter] = paramLimit.max - scaledValue + paramLimit.min;
+                    else
                         params[parameter] = scaledValue;
-                        resetSystem();
-                    } 
+
+                    resetSystem();
                 }
             }
-        }else if(parameter == "lifeDivider"){            
+        }else if(parameter == "lifeDivider" || parameter == "strayParticles"){
             scaledValue = scaleVal(value, topicLimit.min, topicLimit.max, paramLimit.min, paramLimit.max);
             scaledValue = paramLimit.max - scaledValue + paramLimit.min;
             params[parameter] = scaledValue;
