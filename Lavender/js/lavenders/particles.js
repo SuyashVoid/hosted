@@ -24,7 +24,7 @@ var params = {
     noiseStrength: 0.9,
     noiseFreeze: false,
     particleCount: 0,    
-    strayParticleSpeed: 0.01,
+    strayParticleSpeed: 0.041,
     strayNoiseScale: 0.015,
     strayNoiseSpeed: 0.023,
     particleColor: 0x0514e6,
@@ -115,7 +115,7 @@ class Particle {
         this.life += (params.lifeLimit / this.scaleFactor) / params.lifeDivider;
         const posVect = new THREE.Vector3
         if (this.shouldRun) {
-            this.life += (params.lifeLimit / this.scaleFactor) / (params.lifeDivider * 8);
+            this.life += (params.lifeLimit / this.scaleFactor) / (params.lifeDivider * 80);
             if (this.isRight)
                 this.acc.set(0.8, this.ySpeed, 0);
             else

@@ -49,7 +49,7 @@ function setupGUI() {
     gui.add(params, 'shouldResetCam')
 
 
-    f1.add(params, 'noiseScale', 0.06, 0.2).listen();
+    f1.add(params, 'noiseScale', 0.06, 0.5).listen();
     //f1.add(params, 'noiseSpeed', 0, 0.025);
     f1.add(params, 'noiseStrength', 0.9, 1.9).listen();
     //f2.add(params, 'lifeLimit', 30, 400);
@@ -73,12 +73,12 @@ function setupGUI() {
     f4.add(params, 'yRandomness', 0, params.yFactor).onFinishChange(resetSystem)
     f4.add(params, 'lifeDivider', 450, 900).listen()
     f4.add(params, 'lifeVariancy', 0.1, 0.9).onFinishChange(resetSystem)
-    f4.add(params, 'strayParticles', 0, 0.5).onFinishChange(resetSystem).listen()
+    f4.add(params, 'strayParticles', 0, 1).onFinishChange(resetSystem).listen()
     f4.add(params, 'maxFunctionTravel', 0, Math.PI)
     f4.add(params, 'sizeRandomness', 0.1, 0.9).onFinishChange(updateSizes)
 
     f5.add(params, 'particleMultiplier', 1.5, 3).onFinishChange(resetSystem).listen();
-    f5.add(params, 'sizeMultiplier', 1.2, 1.6).onChange(updateSizes);
+    f5.add(params, 'sizeMultiplier', 0, 6).onChange(updateSizes).listen();
     f5.add(params, 'fieldCount', 1, 5, 1).onFinishChange(resetSystem);
     f5.add(params, 'progressiveDecline').onFinishChange(resetSystem);
     f5.add(params, 'depth', 50, 500, 1).onFinishChange(resetSystem);
@@ -94,6 +94,7 @@ function setupGUI() {
     f2.close()
     f3.close()
     f3B.close()
+    gui.close()
         //f4.close()
         //gui.close()
 }
