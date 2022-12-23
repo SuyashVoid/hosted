@@ -1,5 +1,9 @@
 import { resetSystem, updateColors, updateSizes} from "./index.js";
 
+const resetThreshold = 0.1; 
+const humidityThreshold = 88;
+let rainThreshold = 4093;
+
 const host = "poetryai.cloud.shiftr.io"
 var options = {
     clientId: 'LavenderUser'+Math.random()*1000,
@@ -59,10 +63,8 @@ const paramLimits = {
     }
 }
  
-const resetThreshold = 0.1; 
-const humidityThreshold = 88;
-let currentHumidity = 30;
 let currentRain = 4096;
+
 console.log('connecting to ' + host + ' ...');
 const client = mqtt.connect('wss://'+host, options);
 
@@ -78,20 +80,19 @@ client.on('message', function(topic, message) {
     console.log("\nTOPIC: ",topic);
     for(let i = 0; i < topics.length; i++){
         if(topic == topics[i]){            
-            const value = parseInt(message);   
-            if(topic == "Lavender/rain"){
-                currentRain = value;
-            }
+            const value = parseInt(message);               
             if(topic == "Lavender/humidity"){
-                if(value > humidityThreshold && currentHumidity < humidityThreshold){                    
-                    params.particleColor2 = 0x0087fc;
-                    currentHumidity = value;
+                if(value > humidityThreshold ){     
+                    console.log               
+                    params.particleColor2 = 0x0087fc;                    
                     updateColors();
-                }else if(value < humidityThreshold && currentHumidity > humidityThreshold && currentRain > 4095){
-                    params.particleColor2 = 0x49c115;
-                    currentHumidity = value;
+                }else if(value < humidityThreshold  && currentRain > rainThreshold){
+                    params.particleColor2 = 0x49c115;                    
                     updateColors();
                 }
+            }
+            if(topic == "Lavender/rain"){
+                currentRain = value;
             }
             const param = topics[i].split("/")[1];
             const topicLimit = topicLimits[param];
