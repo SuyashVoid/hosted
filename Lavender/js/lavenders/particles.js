@@ -53,7 +53,7 @@ var params = {
     yRandomness: 1.4067,
     lifeDivider: 680,
     lifeVariancy: 0.7,
-    strayParticles: 0.14,
+    strayParticles: 0.06,
     maxFunctionTravel: 2,
     perspectiveDelta: 0.12,
     sizeRandomness: 0.32,
