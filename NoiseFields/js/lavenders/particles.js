@@ -51,11 +51,11 @@ var params = {
 
 var fieldParams = {
     xFactor: 7.15,
-    yFactor: 2.7,
-    yRandomness: 2.0,
-    lifeDivider: 340,
+    yFactor: 3.28,
+    yRandomness: 2.4,
+    lifeDivider: 679.5,
     lifeVariancy: 0.55,
-    strayParticles: 0.005,
+    strayParticles: 0.297,
     maxFunctionTravel: 2.3,
     perspectiveDelta: 0.12,
     sizeRandomness: 0.5,
