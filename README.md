@@ -1,3 +1,10 @@
+# Challenges
+- Google Foobar Challenges : https://github.com/SuyashVoid/Google_Foobar
+![Google Foobar](home/res/images/foobarTitle.pngraw=true "Foobar") 
+   - Got invited by google for the foobar challenge. It was a fun experience. I have already solved 4 levels and I am currently working on the 5th level. I will be updating the solutions to the challenges as I solve them.
+   - They are very interesting and fun challenges from all various domains of computer science.
+   - Google Foobar is also known as secret google hiring challenge.
+
 # Visualizations
 
 - Lavender Visualization: https://suyashVoid.github.io/hosted/NoiseFields/index.html 
