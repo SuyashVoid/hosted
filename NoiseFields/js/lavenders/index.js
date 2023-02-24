@@ -19,7 +19,7 @@ let particleSystem;
 let composer;
 let afterimagePass;
 // Stats
-let stats = new Stats();
+// let stats = new Stats();
 // Particles, Noise and plant displayed
 let particles = [];
 const simplex = new SimplexNoise();
@@ -127,8 +127,8 @@ function setupRenderer() {
 
     });
 
-    stats.showPanel(0);
-    document.body.appendChild(stats.dom);
+    // stats.showPanel(0);
+    // document.body.appendChild(stats.dom);
 }
 
 function updateBG() {
@@ -270,7 +270,7 @@ function giveMeField(x, y, z, len, packDist, isRight, unite) {
 
 function render() {
     controls.update()
-    stats.begin();
+    // stats.begin();
 
     // Update particles only with 60fps in mind
     delta += clock.getDelta();
@@ -289,7 +289,7 @@ function render() {
     updateBG()
     afterimagePass.uniforms['damp'].value = params.trailLen;
     composer.render();
-    stats.end();
+    // stats.end();
     requestAnimationFrame(render);
 }
 
@@ -432,7 +432,7 @@ function setupOrbit() {
 }
 
 
-setupGUI()
+// setupGUI()
 setupRenderer();
 setupOrbit();
 resize();
