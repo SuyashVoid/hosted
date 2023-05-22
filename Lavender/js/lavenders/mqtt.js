@@ -8,7 +8,7 @@ const host = "poetryai.cloud.shiftr.io"
 var options = {
     clientId: 'LavenderUser'+Math.random()*1000,
     username: 'poetryai',
-    password: '605k8jiP5ZQXyMEJ'
+    password: 'gyg27Tz61zJw6BeX'
 }
 const topics = ["Lavender/wind", "Lavender/temp", "Lavender/co2", "Lavender/light", "Lavender/humidity", "Lavender/rain"]
 
