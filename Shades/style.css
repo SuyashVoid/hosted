@@ -163,8 +163,8 @@ transitions
 .float{
 	position:fixed;
   font-size: 1.1em;
-  letter-spacing: 2px;
-	width:120px;
+  letter-spacing: 1px;
+	width:fit-content;
 	height:60px;
 	bottom:40px;
 	right:40px;
@@ -185,6 +185,8 @@ transitions
 .float *{
   position: relative;
   top: 25px;
+  margin-left: 15px;
+  margin-right: 15px;
 }
 
 
