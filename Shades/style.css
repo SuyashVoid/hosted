@@ -21,7 +21,7 @@ h1{
 
 .w{
   width:65vmin;
-  height:90vmin;
+  height:95vmin;
   background-color: #000000cc; 
   box-shadow: 0 0 80px 3px #00000088;
 }
@@ -65,6 +65,8 @@ h1{
 :checked + label.t img {
   -o-object-fit:contain;
      object-fit:contain;
+    position: relative;
+    top: -20px;
 }
 
 /* 
@@ -87,14 +89,14 @@ optional
   transform-origin:bottom center;
 }
 
-:not(:checked) + .t {/*inactive label*/
+:not(:checked) + .t {
   transform: translate3d(0, 0, -10px);
   display: flex;
   pointer-events: auto;
   flex-direction: column;
   flex-wrap: wrap;
   align-content: flex-start;
-  justify-content: flex-end;  
+  justify-content: flex-start;
 }
 
 :not(:checked) + .t:hover {
@@ -105,7 +107,7 @@ optional
 
 :not(:checked) + .t img {
   transform:scale(0.9);/*create gaps*/
-  height: 50%;  
+  height: 80%;  
   position: relative;
   top: -20px;
 }
@@ -115,7 +117,7 @@ optional
   text-overflow:ellipsis;
   font-family: "Lotus Eater", Arial, sans-serif;
   position: relative;
-  top: 100px;
+  top: 120px;
   
 }
 
@@ -149,7 +151,7 @@ transitions
   position: relative;
   top: 50px;
   text-align: center;
-
+  z-index: 1;
 }
 
 /* Css for mobile */
