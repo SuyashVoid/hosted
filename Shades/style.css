@@ -168,18 +168,19 @@ transitions
 	height:60px;
 	bottom:40px;
 	right:40px;
-	background-color:rgba(255, 184, 53, 0.822);
+	background-color:rgba(53, 144, 255, 0.603);
 	color:#ffffff;
 	border-radius:50px;
 	text-align:center;
-	box-shadow: 2px 2px 3px #999;
+	box-shadow: 0px 0px 4px #3d64d8;
   text-decoration: none;
 }
 
 .float:hover{
-  background-color: rgb(255, 197, 70);
+  background-color: rgb(155, 248, 255);
   color: #000;
   text-decoration: none;
+  box-shadow: 0px 0px 16px rgb(170, 222, 255);
 }
 
 .float *{
@@ -203,6 +204,10 @@ transitions
 @media (max-width: 1024px) {
   :not(:checked) + .t .characterName {
     font-size: 3.11vw;
+    
+  }
+  :not(:checked) + .t img {    
+    height: 60%;  
   }
 }
 
@@ -278,6 +283,10 @@ transitions
   .float{
     display: none;
   }
+  :not(:checked) + .t img {    
+    height: 60%;  
+  }
+  
 
 }
   /*
