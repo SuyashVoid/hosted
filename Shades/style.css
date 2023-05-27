@@ -160,6 +160,36 @@ transitions
   text-align: center;
   z-index: 1;
 }
+.float{
+	position:fixed;
+  font-size: 1.1em;
+  letter-spacing: 2px;
+	width:120px;
+	height:60px;
+	bottom:40px;
+	right:40px;
+	background-color:rgba(255, 184, 53, 0.822);
+	color:#ffffff;
+	border-radius:50px;
+	text-align:center;
+	box-shadow: 2px 2px 3px #999;
+  text-decoration: none;
+}
+
+.float:hover{
+  background-color: rgb(255, 197, 70);
+  color: #000;
+  text-decoration: none;
+}
+
+.float *{
+  position: relative;
+  top: 25px;
+}
+
+
+
+
 
 /* Css for mobile */
 @media (max-width: 1444px) {
@@ -239,6 +269,12 @@ transitions
 
   .characterName{
     font-size: 2em;
+  }
+  h1{
+    font-size: 2em;
+  }
+  .float{
+    display: none;
   }
 
 }
