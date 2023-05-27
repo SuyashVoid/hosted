@@ -114,14 +114,15 @@ optional
 
 :not(:checked) + .t img {
   transform:scale(0.9);/*create gaps*/
-  height: 80%;  
+  height: 70%;  
   position: relative;
   top: -20px;
 }
 
 :not(:checked) + .t .characterName {
-  font-size: 1.11vw;
+  font-size: 0.8cqw;
   text-overflow:ellipsis;
+  white-space: nowrap ;  
   font-family: "Lotus Eater", Arial, sans-serif;
   position: relative;
   top: 120px;
@@ -194,18 +195,7 @@ transitions
 
 
 
-/* Css for mobile */
-@media (max-width: 1444px) {
-  :not(:checked) + .t .characterName {
-    font-size: 1.81vw;
-  }
-}
-
-@media (max-width: 1024px) {
-  :not(:checked) + .t .characterName {
-    font-size: 3.11vw;
-    
-  }
+@media (max-width: 1024px) {  
   :not(:checked) + .t img {    
     height: 60%;  
   }
@@ -271,7 +261,9 @@ transitions
   }
 
   :not(:checked) + .t .characterName {
-    font-size: 5.11vw;
+    font-size: 1.9cqw;
+    position: relative;
+    top: 50px;
   }
 
   .characterName{
