@@ -274,7 +274,8 @@ transitions
   h1{
     font-size: 1.5em;
     position: relative;
-    top:15px;
+    top:5px;
+    margin-bottom: 5px;
   }
   .float-pc{
     display: none;
@@ -310,7 +311,7 @@ transitions
   }
 
   :not(:checked) + .t {    
-    bottom: 2%;
+    bottom: 4%;
   }
 
   :not(:checked) + .t img {    

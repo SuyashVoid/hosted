@@ -1,4 +1,4 @@
-const thumnialCount = 5;
+const thumnialCount = 4.5;
 const els = document.querySelectorAll("[type='radio']");
 for (const el of els)
   el.addEventListener("input", e => reorder(e.target, els));
