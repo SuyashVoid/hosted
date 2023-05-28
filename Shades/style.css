@@ -190,7 +190,22 @@ transitions
   display: block;
 }
 
+::-webkit-scrollbar
+{
+  width: 12px;  /* for vertical scrollbars */
+  height: 12px; /* for horizontal scrollbars */
+}
 
+::-webkit-scrollbar-track
+{
+  background: rgba(249, 249, 249, 0.137);
+}
+
+::-webkit-scrollbar-thumb
+{
+  border-radius: 25px;
+  background: rgba(255, 255, 255, 0.368);
+}
 
 
 @media (max-width: 1024px) {  
