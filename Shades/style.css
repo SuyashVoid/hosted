@@ -212,7 +212,7 @@ transitions
   }
   .w {
     width: 80vmin;
-    height: 90vmax;
+    height: 90vh;
     background-color: #00000088;
     box-shadow: 0 0 3px 1px #00000088;
   }
