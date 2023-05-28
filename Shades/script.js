@@ -1,3 +1,4 @@
+const thumnialCount = 5;
 const els = document.querySelectorAll("[type='radio']");
 for (const el of els)
   el.addEventListener("input", e => reorder(e.target, els));
@@ -13,9 +14,11 @@ function reorder(targetEl, els) {
       containerEl.style.setProperty("--l", "0");
     }
     else {//unchecked radios
-      containerEl.style.setProperty("--w", `${100/(nItems-1)}%`);
-      containerEl.style.setProperty("--l", `${processedUncheck * 100/(nItems-1)}%`);
+
+      containerEl.style.setProperty("--w", `${80/(thumnialCount-1)}%`);
+      containerEl.style.setProperty("--l", `${processedUncheck * 100/(thumnialCount-1)}%`);
       processedUncheck += 1;
     }
   }
 }
+

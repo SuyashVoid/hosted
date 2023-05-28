@@ -33,26 +33,33 @@ h1{
   box-shadow: 0 0 80px 3px #00000088;
 }
 
+/* .w {
+  width: 50vmin;
+  height: 70vmin;
+  background-color: #ffffff55;
+  box-shadow: 0 0 18px 4px #ffffff88;
+} */
+
 .ts {
   width:100%; height:100%;
   position:relative;
   --barH:15%;/*active zone height = 100% - barH*/
   overflow-x: scroll;
   overflow-y: hidden;
-  /* margin-right: 10px;
-  margin-left: 10px; */
 }
 
 .t {
   --w:20%;
   display:block; width:var(--w); height:var(--barH);
   position:absolute; bottom:0; left:var(--l);
+  transform-origin:top left;
 }
 
 .t img {
-  dislay:block; width:100%; height:90%;
+  dislay:block; width:100%; height:100%;
   -o-object-fit:cover;
      object-fit:cover;
+  transform:scale(0.8);
 }
 
 [type="radio"] { 
@@ -60,20 +67,17 @@ h1{
 }
 
 :checked + label.t {
-  top:15%;
-  height:65%;
+  left:0; bottom:var(--barH);
+  height:calc(80% - var(--barH));
+  z-index: -10;
 }
 
 :checked + label.t img {
+  
   -o-object-fit:contain;
      object-fit:contain;
     position: relative;
-    top: 60px;
-}
-
-:checked + label.t .characterName {
-  position: absolute;
-  top: 0px;
+    top: -20px;
 }
 
 .thumbnail-bar {
@@ -82,39 +86,57 @@ h1{
   width: fit-content;
 }
 
+
+/* 
+optional
+*/
+
+.ts {/*thumbnails bar*/
+  /* perspective:100px;
+  perspective-origin:center center;
+  transform-style:preserve-3d; */
+  /* pointer-events:none; */
+}
+
 .ts:after {/*the plate*/
   content:"";
   display:block; width:100%; height:15px;
   position:absolute; bottom:0;
   background:linear-gradient(transparent 20%, rgba(0,0,0,0.1));
+  /* transform:rotateX(90deg)scaleX(1.2); */
+  transform-origin:bottom center;
 }
 
 :not(:checked) + .t {  
+  /* transform: translate3d(0, 0, -10px); */
   display: flex;
   pointer-events: auto;
   flex-direction: column;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-content: flex-start;
   justify-content: flex-start;
 }
 
 :not(:checked) + .t:hover {
+  /* transform:translate3d(0, -7px, -15px); */
   box-shadow:0 30px 30px -25px rgba(0,0,0,0.3);
   cursor:pointer;
 }
 
 :not(:checked) + .t img {
+  transform:scale(0.9);/*create gaps*/
   height: 70%;  
-  width: 110%;
+  position: relative;
+  top: -20px;
 }
 
 :not(:checked) + .t .characterName {
-  font-size: 0.81cqw;
-  margin-top: 10px;
+  font-size: 0.7cqw;
   text-overflow:ellipsis;
   white-space: nowrap ;  
   font-family: "Lotus Eater", Arial, sans-serif;
-  
+  position: relative;
+  top: 120px;
   
 }
 
@@ -142,13 +164,14 @@ transitions
 }
 
 .characterName {
-  letter-spacing: 0.5px;
   font-size: 3em;
   /* color: black; */
   width: 100%;  
   margin-left: auto;
   margin-right: auto;
   display: block;
+  position: relative;
+  top: 50px;
   text-align: center;
   z-index: 1;
 }
@@ -166,7 +189,6 @@ transitions
 	text-align:center;
 	box-shadow: 0px 0px 4px #3d64d8;
   text-decoration: none;
-  z-index: 5;
 }
 
 .float:hover{
@@ -183,12 +205,6 @@ transitions
   margin-right: 15px;
 }
 
-.float-mobile{
-  display: none;
-}
-.float-pc{
-  display: block;
-}
 
 
 
@@ -196,9 +212,6 @@ transitions
 @media (max-width: 1024px) {  
   :not(:checked) + .t img {    
     height: 60%;  
-  }
-  .characterName {
-    font-size: 1.5cqw;
   }
 }
 
@@ -212,12 +225,13 @@ transitions
   }
   .w {
     width: 80vmin;
-    height: 90vmax;
+    height: 100vmax;
     background-color: #00000088;
     box-shadow: 0 0 3px 1px #00000088;
   }
 
-  .ts {    
+  .ts {
+    perspective:50px;
     width: 100%;
     height: 100%;
     position: relative;
@@ -232,16 +246,17 @@ transitions
     height: var(--barH);
     position: absolute;
     bottom: 0;
-    left: var(--l);    
+    left: var(--l);
+    transform-origin: top left;
   }
 
   .t img {
     dislay: block;
     width: 100%;
-    height: 70%;
+    height: 100%;
     -o-object-fit: cover;
     object-fit: cover;
-    /* transform: scale(0.8); */
+    transform: scale(0.8);
   }
 
   [type="radio"] {
@@ -250,68 +265,32 @@ transitions
 
   :checked + label.t {
     left: 0;
-    top: 10%;
-    height: 65%;
+    bottom: var(--barH);
+    height: calc(100% - var(--barH));
   }
 
   :checked + label.t img {
     -o-object-fit: contain;
     object-fit: contain;
-    height: 100%;;
-    top:40px;
   }
-  
 
   :not(:checked) + .t .characterName {
     font-size: 1.9cqw;
     position: relative;
-    top: 0px;
+    top: 50px;
   }
 
   .characterName{
     font-size: 2em;
   }
   h1{
-    font-size: 1.5em;
-    position: relative;
-    top:15px;
-  }
-  .float-pc{
-    display: none;
+    font-size: 2em;
   }
   .float{
-    bottom: 20px;
-    right: 20px;
-    width: 70px; 
-    height: 70px;     
-    color: #000;
-    background-color:rgba(53, 144, 255, 0.824);
-    text-decoration: none;
-    box-shadow: 0px 0px 16px rgb(0, 100, 163);   
+    display: none;
   }
-  .float:hover{
-  background-color: rgb(155, 248, 255);
-  }
-  .float:hover img{
-    filter: invert(100%);
-  }
-  .float-mobile{
-    display: block;   
-  }
-  .float *{
-    top: 6px;
-    width: 40px;
-    height: 40px;
-  }
-  .float img{
-    
-    margin-left: 0px;
-    margin-right: 0px;
-  }
-
   :not(:checked) + .t img {    
     height: 60%;  
-    margin-left: 10px;
   }
   
 
