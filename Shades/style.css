@@ -309,9 +309,12 @@ transitions
     margin-right: 0px;
   }
 
+  :not(:checked) + .t {    
+    bottom: 2%;
+  }
+
   :not(:checked) + .t img {    
-    height: 60%;  
-    margin-left: 10px;
+    height: 60%;      
   }
   
 
