@@ -2,8 +2,8 @@
 const characters = [
   {"id": "c3", "image": "media/x0.jpg", "name": "Ariane Lockwood"},
   {"id": "c2", "image": "media/x1.jpg", "name": "Illeana Maximillian"},
-  {"id": "c7", "image": "media/x2.jpg", "name": "Unrevealed"},
-  {"id": "c8", "image": "media/x3.jpg", "name": "Unrevealed"},
+  {"id": "c7", "image": "media/x2.jpg", "name": "Cera Thorne"},
+  {"id": "c8", "image": "media/x3.jpg", "name": "Helena Von Arden"},
   {"id": "c6", "image": "media/y0.jpg", "name": "Vern Lockwood"},
   {"id": "c5", "image": "media/y1.jpg", "name": "Hensen Vehen"},
   {"id": "c4", "image": "media/y2.jpg", "name": "Unrevealed"}
