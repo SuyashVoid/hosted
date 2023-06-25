@@ -7,7 +7,7 @@ const characters = [
   {"id": "c6", "image": "media/y0.jpg", "name": "Vern Lockwood"},
   {"id": "c5", "image": "media/y1.jpg", "name": "Hensen Vehen"},
   {"id": "c4", "image": "media/y2.jpg", "name": "Unknown"},
-  {"id": "c5", "image": "media/ElmMap.jpg", "name": "Elmhurst rough map"}
+  {"id": "c9", "image": "media/ElmMap.jpg", "name": "Elmhurst rough map"}
 ];
 
 const tbc = [{"id": "c9", "image": "media/tbc.jpg", "name": "To Be Continued"}]
