@@ -10,7 +10,7 @@ const characters = [
   {"id": "c9", "image": "media/ElmMap.jpg", "name": "Elmhurst rough map"}
 ];
 
-const tbc = [{"id": "c9", "image": "media/tbc.jpg", "name": "To Be Continued"}]
+const tbc = [{"id": "c80", "image": "media/tbc.jpg", "name": "To Be Continued"}]
 const prevCover = [{"id": "c1", "image": "media/PhotoRealCover.jpg", "name": "Previous Cover"}]
 
 // Fisher-Yates shuffle algorithm
