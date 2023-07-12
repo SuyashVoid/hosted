@@ -11,6 +11,7 @@ const characters = [
 ];
 
 const tbc = [{"id": "c9", "image": "media/tbc.jpg", "name": "To Be Continued"}]
+const prevCover = [{"id": "c1", "image": "media/PhotoRealCover.jpg", "name": "Previous Cover"}]
 
 // Fisher-Yates shuffle algorithm
 function shuffle(array) {
@@ -57,6 +58,7 @@ function generateHTML(data) {
   const container = document.getElementsByClassName('thumbnail-bar')[0]; // select the parent container
   data = shuffle(data); // shuffle data before generating HTML
   data.push(tbc[0]); // add TBC image to the end of the array
+  data.unshift(prevCover[0]); // add previous cover image to the beginning of the array
 
   data.forEach(character => {
       const [radioInput, label] = generateCharacterHTML(character);
