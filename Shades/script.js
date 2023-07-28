@@ -7,11 +7,12 @@ const characters = [
   {"id": "c6", "image": "media/y0.jpg", "name": "Vern Lockwood"},
   {"id": "c5", "image": "media/y1.jpg", "name": "Hensen Vehen"},
   {"id": "c4", "image": "media/y2.jpg", "name": "Unknown"},
+  {"id": "c10", "image": "media/RuinedLibrary.png", "name": "Eleonora's Archive"},
   {"id": "c9", "image": "media/ElmMap.jpg", "name": "Elmhurst rough map"}
 ];
 
 const tbc = [{"id": "c80", "image": "media/tbc.jpg", "name": "To Be Continued"}]
-const prevCover = [{"id": "c1", "image": "media/PhotoRealCover.jpg", "name": "Previous Cover"}]
+const prevCover = [{"id": "c1", "image": "media/Cover2.jpg", "name": "Previous Cover"}]
 
 // Fisher-Yates shuffle algorithm
 function shuffle(array) {
