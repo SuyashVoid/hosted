@@ -8,6 +8,9 @@ tippy('.infoBtn', {
 
 // First form
 document.querySelector('#royaltyCalculator').addEventListener('submit', function (e) {
+    container = document.querySelector('#resultsContainer');
+    container.classList.remove('hiddenResultsContainer');
+    container.classList.add('fade-in');
     e.preventDefault();
     handleTable();
 });
@@ -46,20 +49,11 @@ function handleTable() {
     showODS = document.querySelector('#showODS').checked;
 
     table = document.querySelector('#resultsTable');
-    container = document.querySelector('#resultsContainer');
-
-    // I first gotta make table visible by setting its display to table
-    container.classList.remove('hiddenResultsContainer');
-    container.classList.add('fade-in');
-
-
     tbody = document.querySelector('#resultsBody');
-    // I will first remove all rows (non-header) from the table
+    // Remove all rows except the first one to keep the table header
     while (table.rows.length > 1) {
         table.deleteRow(1);
     }
-    // Then I will add the rows based on the values of showAmazon and showODS (First row is always there)
-    // 4 Columns are Print Provider, Minimum List Price, Print Cost, Estimated Royalty    
     {
         var cost = 'N/A';
         var minLP = 'N/A';
@@ -83,9 +77,8 @@ function handleTable() {
         row.insertCell(3).innerHTML = royalty;
     }
 
-
+    // If the user wants to see the other options, show them
     if (showAmazon) {
-        // I will add the row for Amazon
         var cost = 'N/A';
         var minLP = 'N/A';
         var royalty = 'N/A';
