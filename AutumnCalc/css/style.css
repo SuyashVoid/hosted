@@ -1,0 +1,133 @@
+/* Load raleway font using import and include light,regular,bold */
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;600&display=swap');
+body{
+    font-family: 'Raleway', sans-serif;    
+    /* background-image: url(/AutumnCalc/Media/bg2x.webp);     */
+    background-size: cover;    
+    background-repeat: no-repeat;
+    /* Blur the background, not the content */
+    background-position: center;
+    background-attachment: fixed;    
+}
+
+.royaltyContainer,.queryContainer{
+    background-color: #ffffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: 400px;
+    box-shadow: 3px 3px 10px 0 rgba(0,0,0,0.3);
+    padding: 20px;
+    padding-top: 40px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s;
+}
+
+.fade-out {
+    animation: fadeOut 1s;
+}
+
+.resultsContainer table{    
+    box-shadow: 3px 3px 10px 0 rgba(0,0,0,0.3);    
+}
+
+.queryContainer, .resultsContainer{
+    width: 50%;
+}
+
+form{
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap:25px;
+}
+
+.form-check{
+    margin-top: 10px;
+    margin-bottom: -5px;
+}
+
+.form-group > label{
+    font-weight: 600;
+}
+
+.subtitle{
+    font-weight: 100;
+}
+
+tr {
+    line-height: 30px;
+    vertical-align: middle;
+    min-height: 30px;
+    height: 30px;
+ }
+
+.infoBtn{
+    margin-left: 5px;
+    background-color: rgba(20, 21, 21, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    width: 20px;
+    height: 20px;
+    font-size: 0.8em;
+    line-height: 0px;
+    border-radius: 100%;
+    cursor: pointer;    
+    font-weight: 600;
+    color: white;
+    text-align: center;
+}
+.infoBtn:hover{
+    background-color: rgba(255, 255, 255, 1);
+    border: 1px solid rgb(23, 24, 24);
+    color: rgb(0, 0, 0);
+}
+
+.typewriter h2, .typewriter h4 {
+    overflow: hidden; /* Ensures the content is not revealed until the animation */
+    border-right: .15em solid black; /* Cursor-like border */
+    white-space: nowrap; /* Keeps the content on a single line */
+    margin: 0 auto; /* Gives that typewriter feel */
+    letter-spacing: .15em; /* Adjust as needed */
+    animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+}
+
+/* The typing effect */
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+/* The typewriter cursor effect */
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: black }
+}
+
+
+/* Css for mobiles */
+@media only screen and (max-width: 600px) {
+    .royaltyContainer,.queryContainer{
+        width: 95%;
+    }    
+    .resultsContainer{
+        width: 100%;
+    }
+    form{
+        padding: 10px;
+    }
+}

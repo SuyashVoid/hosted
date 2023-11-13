@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Royalty Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@4/themes/light-border.css"/>
+    <link rel="stylesheet" href="css/style.css">        
+  </head>
+  <body>
+    <body>
+        <div class="container mt-5 mb-5 royaltyContainer">
+            <h3 class="title">Printing Cost Calculator</h3>
+            <form id="royaltyCalculator">
+               
+                
+                <!-- Pages -->
+                <div class="form-group">
+                    <label for="numPages">Pages</label>
+                    <input type="number" class="form-control" id="numPages" placeholder="250" required>
+                </div>
+    
+                <!-- Book Price -->
+                <div class="form-group">
+                    <label for="listPrice">List price</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" id="listPrice" placeholder="19.50" step="0.01" min="3.00" title="Currency" required>
+                    </div>
+                </div>
+
+                <!-- Royalty Rate -->
+                <div class="form-group">
+                    <label>Display Competitor Pricing</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="competitorName" id="showAmazon" value="CAMZ" checked>
+                        <label class="form-check-label" for="showAmazon">Amazon</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="competitorName" id="showODS" value="CODS" checked>
+                        <label class="form-check-label" for="showODS">Other On-demand Printing Services</label>
+                    </div>
+                </div>
+    
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary">Calculate</button>
+            </form>
+        </div>
+
+        <div class="container mt-5 mb-5 resultsContainer">  
+            <h2 class="subtitle text-center">Results</h2>      
+            <table class="table table-hover table-responsive table-bordered" id="resultsTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Print Provider</th>                        
+                        <th scope="col">Minimum List price
+                            <button type="button" class="infoBtn" data-tippy-content="The lowest price at which you may sell your book in order to cover the printing costs. It ensures that your royalties earned are always enough to cover the cost to print your book.">i</button>
+                                <i class="fas fa-info-circle"></i></button> 
+                        </th>
+                        <th scope="col">Printing Cost
+                            <button type="button" class="infoBtn" data-tippy-content="Printing costs are deducted from royalties.">i</button>
+                                <i class="fas fa-info-circle"></i></button> 
+                        </th>
+                        <th scope="col">Estimated Royalty
+                            <button type="button" class="infoBtn" data-tippy-content="This is an estimate of how much you'll earn for each sale, based on the list price, royalty rate, and deducted print costs. Your royalty is 60% of your list price for print books sold on Amazon, and 40% for paperback books sold through Expanded Distribution">i</button>
+                                <i class="fas fa-info-circle"></i></button> 
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody">
+                    <tr>
+                        <td>Autumn Fiction</td>
+                        <td>$0</td>                        
+                        <td>$0</td>
+                        <td>$0</td>
+                    </tr>
+                    <tr>
+                        <td>Amazon</td>
+                        <td>$0</td>                        
+                        <td>$0</td>
+                        <td>$0</td>
+                    </tr>
+                    <tr>
+                        <td>On Demand Printing</td>
+                        <td>$0</td>
+                        <td>$0</td>                        
+                        <td>$0</td>
+                    </tr>
+                </tbody>
+            </table>        
+        </div>
+
+        <!-- give me A cool bootstrap element to have a cool text line -->
+        <div class="container mt-5 mb-5 text-center">
+            <h1 id="postTitle">Interested?</h1>
+            <h3 id="postSubTitle">Email us today and we'll contact you ASAP for the next steps!</h3>
+        </div>
+        
+
+        <div class="container mt-5 queryContainer mb-5" id="emailFormContainer">
+            <h3 class="subtitle">Get your book on our platform.</h3>
+            <form id="emailForm">
+               
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email (required)</label>
+                    <input type="email" class="form-control" id="email" placeholder="example@example.com" required>
+                </div>
+    
+                <!-- Name/Penname -->
+                <div class="form-group">
+                    <label for="name">Name/Penname</label>
+                    <input type="text" class="form-control" id="name" placeholder="John Doe" required>
+                </div>
+    
+                <!-- Phone -->
+                <div class="form-group">
+                    <label for="phone">Phone (optional)</label>
+                    <input type="tel" class="form-control" id="phone" placeholder="123-456-7890">
+                </div>
+    
+                <!-- Book Title -->
+                <div class="form-group">
+                    <label for="bookTitle">Book Title (optional)</label>
+                    <input type="text" class="form-control" id="bookTitle" placeholder="The Great Gatsby">
+                </div>
+    
+                <!-- Additional Info -->
+                <div class="form-group">
+                    <label for="additionalInfo">Additional Info (optional)</label>
+                    <textarea class="form-control" id="additionalInfo" rows="5" placeholder="Enter additional information here"></textarea>
+                </div>
+    
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary">Send</button>
+            </form>
+        </div>
+    
+        
+            
+        <script src="https://unpkg.com/popper.js@1"></script>
+        <script src="https://unpkg.com/tippy.js@4"></script>
+        <script src="js/index.js"></script>
+  </body>
+</html>
+
+
+    
