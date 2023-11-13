@@ -1,3 +1,4 @@
+const formLink = "1FAIpQLSfXsCWOt5xLh7idtG5gHGVHH3RDbaFAvZgHa931hkQSwPxrQw";
 tippy('.infoBtn', {
     theme: 'light-border',
     distance: 20,
@@ -77,7 +78,7 @@ function handleTable() {
 
         if (listPrice && numPages) {
             cost = (0.4 * listPrice) + (numPages * 0.012) + 1;
-            royalty = (0.6 * listPrice) - cost;
+            royalty = (0.6 * listPrice) - (numPages * 0.012 + 1);
 
             cost = "$" + cost.toFixed(2);
             royalty = "$" + royalty.toFixed(2);
@@ -155,7 +156,7 @@ function formSender({ email, penname, phone, bookTitle, info }) {
     postSubtitle = document.querySelector('#postSubtitle')
     formContainer = document.querySelector('#emailFormContainer');
 
-    fetch('https://docs.google.com/forms/d/1mPNksLnz5nvSwPXUCEaMfByV3aGSGwCmmmNkMXDlpy4/formResponse', {
+    fetch('https://docs.google.com/forms/d/' + formLink + '/formResponse', {
         method: 'POST',
         body: formvals,
         mode: 'no-cors' // This is important to avoid CORS issues
