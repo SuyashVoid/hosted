@@ -149,14 +149,16 @@ function formSender({ email, penname, phone, bookTitle, info }) {
     formvals.append('entry.1045781291', email);
     formvals.append('entry.2005620554', penname);
     formvals.append('entry.1166974658', phone);
-    formvals.append('entry.839337160', bookTitle);
-    formvals.append('entry.1065046570', info);
+    formvals.append('entry.1065046570', bookTitle);
+    formvals.append('entry.839337160', info);
+
+
 
     postTitle = document.querySelector('#postTitle')
     postSubtitle = document.querySelector('#postSubtitle')
     formContainer = document.querySelector('#emailFormContainer');
 
-    fetch('https://docs.google.com/forms/d/' + formLink + '/formResponse', {
+    fetch('https://docs.google.com/forms/d/e/' + formLink + '/formResponse', {
         method: 'POST',
         body: formvals,
         mode: 'no-cors' // This is important to avoid CORS issues
@@ -173,7 +175,7 @@ function formSender({ email, penname, phone, bookTitle, info }) {
                 typeWriterEffect(postTitle, "Query Recieved.", 30);
                 typeWriterEffect(postSubTitle, "We will get back to you ASAP!", 30);
             }, 200);
-        }, 1000); // 500ms matches the animation duration
+        }, 1000); // 500ms matches the animation duration        
 
     }).catch((error) => {
         console.log(error)
