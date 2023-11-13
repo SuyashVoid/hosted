@@ -45,6 +45,13 @@ body{
     box-shadow: 3px 3px 10px 0 rgba(0,0,0,0.3);    
 }
 
+.hiddenResultsContainer{
+    height: 0px;
+    overflow: hidden;
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+}
+
 .queryContainer, .resultsContainer{
     width: 50%;
 }

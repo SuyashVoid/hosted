@@ -25,8 +25,8 @@ document.querySelector('#emailForm').addEventListener('submit', function (e) {
     setTimeout(() => {
         formContainer.remove()
         setTimeout(() => {
-            typeWriterEffect(postTitle, "Query Recieved!", 30);
-            typeWriterEffect(postSubTitle, "We will get back to you ASAP.", 30);
+            typeWriterEffect(postTitle, "Query Recieved.", 30);
+            typeWriterEffect(postSubTitle, "We will get back to you ASAP!", 30);
         }, 200);
     }, 1000); // 500ms matches the animation duration
 });
@@ -46,6 +46,13 @@ function handleTable() {
     showODS = document.querySelector('#showODS').checked;
 
     table = document.querySelector('#resultsTable');
+    container = document.querySelector('#resultsContainer');
+
+    // I first gotta make table visible by setting its display to table
+    container.classList.remove('hiddenResultsContainer');
+    container.classList.add('fade-in');
+
+
     tbody = document.querySelector('#resultsBody');
     // I will first remove all rows (non-header) from the table
     while (table.rows.length > 1) {
@@ -140,5 +147,3 @@ function typeWriterEffect(element, text, speed) {
 
     typing();
 }
-
-handleTable();
