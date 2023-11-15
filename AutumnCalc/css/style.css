@@ -28,6 +28,10 @@ body{
     to { opacity: 0; }
 }
 
+.whiteText{
+    color: white;
+}
+
 .fade-in {
     animation: fadeIn 0.5s;
 }
@@ -48,7 +52,7 @@ body{
 }
 
 .queryContainer, .resultsContainer{
-    width: 50%;
+    width: 70%;
 }
 
 form{
