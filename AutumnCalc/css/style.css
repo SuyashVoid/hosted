@@ -1,13 +1,8 @@
 /* Load raleway font using import and include light,regular,bold */
 @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@200;400;600&display=swap');
 body{
-    font-family: 'Raleway', sans-serif;    
-    /* background-image: url(/AutumnCalc/Media/bg2x.webp);     */
-    background-size: cover;    
-    background-repeat: no-repeat;
-    /* Blur the background, not the content */
-    background-position: center;
-    background-attachment: fixed;    
+    font-family: 'Raleway', sans-serif;            
+    background-color: transparent;
 }
 
 .royaltyContainer,.queryContainer{
