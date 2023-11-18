@@ -55,6 +55,10 @@ body{
     width: 70%;
 }
 
+.queryContainer{
+    margin-bottom: 40px !important;
+}
+
 form{
     padding: 20px;
     display: flex;
