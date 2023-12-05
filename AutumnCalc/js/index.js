@@ -55,7 +55,7 @@ function handleTable() {
         var royalty = 'N/A';
 
         if (listPrice && numPages) {
-            cost = (numPages * 0.015) + 3
+            cost = (numPages * 0.014) + 4
             royalty = (listPrice - cost)
 
             cost = "$" + cost.toFixed(2);
